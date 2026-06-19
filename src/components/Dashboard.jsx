@@ -1218,7 +1218,8 @@ export default function Dashboard({ user, onLogout }) {
                     {profile.plan === 'free' || !profile.plan_expires_at
                       ? 'Sem vencimento'
                       : (() => {
-                          const parts = profile.plan_expires_at.split('-');
+                          const dateOnly = profile.plan_expires_at.substring(0, 10);
+                          const parts = dateOnly.split('-');
                           return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : profile.plan_expires_at;
                         })()}
                   </span>
