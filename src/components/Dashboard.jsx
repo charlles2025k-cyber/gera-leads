@@ -45,22 +45,14 @@ export default function Dashboard({ user, onLogout }) {
   const [searchHistory, setSearchHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
 
-  // Plan Expiration State
-  const [planInfo, setPlanInfo] = useState(() => {
-    const saved = localStorage.getItem('user_plan_info');
-    if (saved) return JSON.parse(saved);
-    
-    // Default mock plan: Trimestral, expiring in 15 days
-    const expDate = new Date();
-    expDate.setDate(expDate.getDate() + 15);
-    return {
-      name: 'Trimestral',
-      expirationDate: expDate.toISOString().split('T')[0],
-      daysRemaining: 15
-    };
+  // User Profile from Supabase
+  const [profile, setProfile] = useState({
+    plan: 'free',
+    plan_expires_at: null
   });
+  const [loadingProfile, setLoadingProfile] = useState(true);
 
-  // Load API key, previous results, and history on mount
+  // Load API key, profile, and history on mount
   useEffect(() => {
     const savedKey = localStorage.getItem('apify_api_key') || '';
     setApiKey(savedKey);
@@ -68,19 +60,59 @@ export default function Dashboard({ user, onLogout }) {
       setApiKeySaved(true);
     }
 
-    // Refresh remaining days based on saved expiration date
-    const exp = new Date(planInfo.expirationDate);
-    const today = new Date();
-    const diffTime = exp - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    setPlanInfo(prev => {
-      const updated = { ...prev, daysRemaining: diffDays };
-      localStorage.setItem('user_plan_info', JSON.stringify(updated));
-      return updated;
-    });
-
+    fetchUserProfile();
     fetchSearchHistory();
   }, []);
+
+  // Fetch user profile from Supabase profiles table
+  const fetchUserProfile = async () => {
+    setLoadingProfile(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, plan, plan_expires_at')
+          .eq('id', session.user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        
+        if (data) {
+          setProfile(data);
+        } else {
+          setProfile({
+            plan: 'free',
+            plan_expires_at: null
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Erro ao carregar perfil do Supabase:", err);
+      setProfile({
+        plan: 'free',
+        plan_expires_at: null
+      });
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
+
+  // Calculate days remaining and expired status
+  const daysRemaining = useMemo(() => {
+    if (!profile || profile.plan === 'free' || !profile.plan_expires_at) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const expiration = new Date(profile.plan_expires_at);
+    expiration.setHours(0, 0, 0, 0);
+    const diffTime = expiration - today;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }, [profile]);
+
+  const isExpired = useMemo(() => {
+    if (!profile || profile.plan === 'free') return false;
+    return daysRemaining !== null && daysRemaining <= 0;
+  }, [profile, daysRemaining]);
 
   // Fetch search history from Supabase
   const fetchSearchHistory = async () => {
@@ -658,7 +690,26 @@ export default function Dashboard({ user, onLogout }) {
 
         {/* Tab 2: Gerar Leads (Current Search UI) */}
         {activeTab === 'search' && (
-          <div className="space-y-8 animate-fade-in">
+          isExpired ? (
+            <div className="flex items-center justify-center min-h-[450px] p-4 animate-fade-in">
+              <div className="w-full max-w-md bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-8 shadow-2xl text-center space-y-6">
+                <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto animate-pulse-soft">
+                  <AlertCircle className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold font-display text-white mb-2">Acesso Bloqueado</h3>
+                  <p className="text-slate-400 text-xs leading-relaxed">Seu plano venceu. Renove para continuar.</p>
+                </div>
+                <button
+                  onClick={() => setActiveTab('plans')}
+                  className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl transition-all shadow-lg hover:shadow-blue-500/20 active:scale-[0.98] cursor-pointer"
+                >
+                  Ver Planos
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-8 animate-fade-in">
             {/* Header */}
             <div className="border-b border-slate-900 pb-5">
               <h2 className="text-2xl font-bold font-display text-white">Gerar Leads</h2>
@@ -1018,7 +1069,8 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             </div>
           </div>
-        )}
+        )
+      )}
 
         {/* Tab 3: Planos */}
         {activeTab === 'plans' && (
@@ -1135,13 +1187,10 @@ export default function Dashboard({ user, onLogout }) {
                 Status do Plano
               </h3>
 
-              {planInfo.daysRemaining <= 0 ? (
-                <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl flex items-start gap-3 text-xs font-medium">
-                  <AlertCircle className="w-5 h-5 shrink-0" />
-                  <div>
-                    <span className="font-bold block">Plano vencido</span>
-                    <span className="mt-1 block leading-relaxed">Renove seu plano para continuar acessando todos os recursos da plataforma de leads.</span>
-                  </div>
+              {isExpired ? (
+                <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl flex items-center gap-2 text-xs font-semibold">
+                  <AlertCircle className="w-4 h-4 shrink-0 animate-pulse" />
+                  <span>Plano vencido — renove para continuar</span>
                 </div>
               ) : (
                 <div className="p-4 bg-indigo-500/5 border border-indigo-500/10 text-indigo-300 rounded-xl flex items-start gap-3 text-xs leading-relaxed">
@@ -1155,20 +1204,30 @@ export default function Dashboard({ user, onLogout }) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                 <div className="p-3.5 bg-slate-950/50 rounded-xl border border-slate-800">
                   <span className="text-slate-500 block">Plano Atual</span>
-                  <span className="text-white font-bold block mt-1 text-sm">{planInfo.name}</span>
+                  <span className="text-white font-bold block mt-1 text-sm">
+                    {profile.plan === 'free' ? 'Gratuito' : 
+                     profile.plan === 'monthly' ? 'Mensal' : 
+                     profile.plan === 'quarterly' ? 'Trimestral' : 
+                     profile.plan === 'annual' ? 'Anual' : profile.plan}
+                  </span>
                 </div>
 
                 <div className="p-3.5 bg-slate-950/50 rounded-xl border border-slate-800">
                   <span className="text-slate-500 block">Vencimento</span>
                   <span className="text-white font-bold block mt-1 text-sm">
-                    {new Date(planInfo.expirationDate).toLocaleDateString('pt-BR')}
+                    {profile.plan === 'free' || !profile.plan_expires_at
+                      ? 'Sem vencimento'
+                      : (() => {
+                          const parts = profile.plan_expires_at.split('-');
+                          return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : profile.plan_expires_at;
+                        })()}
                   </span>
                 </div>
 
                 <div className="p-3.5 bg-slate-950/50 rounded-xl border border-slate-800">
                   <span className="text-slate-500 block">Tempo Restante</span>
-                  <span className={`font-bold block mt-1 text-sm ${planInfo.daysRemaining <= 0 ? 'text-red-450' : 'text-white'}`}>
-                    {planInfo.daysRemaining <= 0 ? 'Expirado' : `${planInfo.daysRemaining} dias`}
+                  <span className={`font-bold block mt-1 text-sm ${isExpired ? 'text-red-450' : 'text-white'}`}>
+                    {profile.plan === 'free' ? '—' : (isExpired ? 'Expirado' : `${daysRemaining} dias`)}
                   </span>
                 </div>
               </div>
