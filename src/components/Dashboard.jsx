@@ -3,7 +3,8 @@ import {
   Key, Eye, EyeOff, Search, Download, LogOut, ShieldCheck, 
   MapPin, Sliders, Database, AlertCircle, FileSpreadsheet,
   CheckCircle, RefreshCw, Layers, ExternalLink, HelpCircle,
-  Settings, MessageSquare, Send, CreditCard, BarChart3, Clock, User
+  Settings, MessageSquare, Send, CreditCard, BarChart3, Clock, User,
+  Lock, BookOpen, Users, XCircle
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { 
@@ -57,6 +58,13 @@ export default function Dashboard({ user, onLogout }) {
   const [usageTracking, setUsageTracking] = useState({
     leads_used: 0,
     period_start: null
+  });
+
+  // Modal Lock State
+  const [lockModal, setLockModal] = useState({
+    isOpen: false,
+    title: '',
+    message: ''
   });
 
   // Load API key, profile, usage and history on mount
@@ -186,6 +194,8 @@ export default function Dashboard({ user, onLogout }) {
     if (plan === 'annual') return 'Anual';
     return 'Gratuito';
   }, [profile]);
+
+  const userPlan = useMemo(() => (profile?.plan || 'free').trim(), [profile]);
 
   // Compute progress percent for limit bar
   const progressPercent = useMemo(() => {
@@ -657,6 +667,58 @@ export default function Dashboard({ user, onLogout }) {
               Gerar Leads
             </button>
             <button
+              onClick={() => {
+                if (userPlan === 'quarterly' || userPlan === 'annual') {
+                  setActiveTab('course');
+                } else {
+                  setLockModal({
+                    isOpen: true,
+                    title: 'Curso Bloqueado',
+                    message: 'Faça upgrade do seu plano para acessar o Curso.'
+                  });
+                }
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border border-transparent cursor-pointer ${
+                activeTab === 'course'
+                  ? 'bg-indigo-600/10 text-indigo-400 border-indigo-500/20 font-bold'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-850/30'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <BookOpen className="w-4 h-4" />
+                Curso
+              </div>
+              {userPlan !== 'quarterly' && userPlan !== 'annual' && (
+                <Lock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+              )}
+            </button>
+            <button
+              onClick={() => {
+                if (userPlan === 'annual') {
+                  setActiveTab('vip');
+                } else {
+                  setLockModal({
+                    isOpen: true,
+                    title: 'Grupo VIP Bloqueado',
+                    message: 'Faça upgrade do seu plano para acessar o Grupo VIP.'
+                  });
+                }
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border border-transparent cursor-pointer ${
+                activeTab === 'vip'
+                  ? 'bg-indigo-600/10 text-indigo-400 border-indigo-500/20 font-bold'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-850/30'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Users className="w-4 h-4" />
+                Grupo VIP
+              </div>
+              {userPlan !== 'annual' && (
+                <Lock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+              )}
+            </button>
+            <button
               onClick={() => setActiveTab('plans')}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border border-transparent cursor-pointer ${
                 activeTab === 'plans'
@@ -692,7 +754,7 @@ export default function Dashboard({ user, onLogout }) {
       </aside>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0a0f1b]/95 border-t border-slate-850 backdrop-blur-lg flex items-center justify-around z-40 px-2">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0a0f1b]/95 border-t border-slate-850 backdrop-blur-lg flex items-center justify-around z-40 px-1 gap-1">
         <button
           onClick={() => setActiveTab('dashboard')}
           className={`flex flex-col items-center gap-1 text-[9px] font-semibold transition-colors cursor-pointer ${
@@ -710,6 +772,54 @@ export default function Dashboard({ user, onLogout }) {
         >
           <Search className="w-4 h-4" />
           Buscar
+        </button>
+        <button
+          onClick={() => {
+            if (userPlan === 'quarterly' || userPlan === 'annual') {
+              setActiveTab('course');
+            } else {
+              setLockModal({
+                isOpen: true,
+                title: 'Curso Bloqueado',
+                message: 'Faça upgrade do seu plano para acessar o Curso.'
+              });
+            }
+          }}
+          className={`flex flex-col items-center gap-1 text-[9px] font-semibold transition-colors cursor-pointer relative ${
+            activeTab === 'course' ? 'text-indigo-400 font-bold' : 'text-slate-500'
+          }`}
+        >
+          <div className="relative">
+            <BookOpen className="w-4 h-4" />
+            {userPlan !== 'quarterly' && userPlan !== 'annual' && (
+              <Lock className="w-2.5 h-2.5 text-slate-500 absolute -top-1.5 -right-1.5 bg-[#0a0f1b] rounded-full p-0.5" />
+            )}
+          </div>
+          Curso
+        </button>
+        <button
+          onClick={() => {
+            if (userPlan === 'annual') {
+              setActiveTab('vip');
+            } else {
+              setLockModal({
+                isOpen: true,
+                title: 'Grupo VIP Bloqueado',
+                message: 'Faça upgrade do seu plano para acessar o Grupo VIP.'
+              });
+            }
+          }}
+          className={`flex flex-col items-center gap-1 text-[9px] font-semibold transition-colors cursor-pointer relative ${
+            activeTab === 'vip' ? 'text-indigo-400 font-bold' : 'text-slate-500'
+          }`}
+        >
+          <div className="relative">
+            <Users className="w-4 h-4" />
+            {userPlan !== 'annual' && (
+              <Lock className="w-2.5 h-2.5 text-slate-500 absolute -top-1.5 -right-1.5 bg-[#0a0f1b] rounded-full p-0.5" />
+            )}
+          </div>
+          VIP
         </button>
         <button
           onClick={() => setActiveTab('plans')}
@@ -866,6 +976,48 @@ export default function Dashboard({ user, onLogout }) {
                     </>
                   )}
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Curso */}
+        {activeTab === 'course' && (userPlan === 'quarterly' || userPlan === 'annual') && (
+          <div className="space-y-8 animate-fade-in max-w-4xl mx-auto">
+            <div className="border-b border-slate-900 pb-5">
+              <h2 className="text-2xl font-bold font-display text-white">Curso Renda Extra</h2>
+              <p className="text-slate-400 text-xs mt-1">Aprenda a prospectar e vender para leads sem site</p>
+            </div>
+            <div className="p-8 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl text-center space-y-6">
+              <div className="w-16 h-16 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto">
+                <BookOpen className="w-8 h-8" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg font-bold font-display text-white">Em breve: conteúdo do curso</h3>
+                <p className="text-slate-400 text-xs max-w-lg mx-auto leading-relaxed">
+                  Estamos finalizando as aulas e materiais complementares do método completo para você fechar contratos de criação de sites, gestão de redes sociais e SEO local com os leads prospectados.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Grupo VIP */}
+        {activeTab === 'vip' && userPlan === 'annual' && (
+          <div className="space-y-8 animate-fade-in max-w-4xl mx-auto">
+            <div className="border-b border-slate-900 pb-5">
+              <h2 className="text-2xl font-bold font-display text-white">Grupo VIP de Suporte</h2>
+              <p className="text-slate-405 text-xs mt-1">Networking e estratégias exclusivas de fechamento</p>
+            </div>
+            <div className="p-8 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl text-center space-y-6">
+              <div className="w-16 h-16 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto">
+                <Users className="w-8 h-8" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg font-bold font-display text-white">Em breve: acesso ao Grupo VIP</h3>
+                <p className="text-slate-400 text-xs max-w-lg mx-auto leading-relaxed">
+                  Em breve você receberá os dados de acesso para ingressar na nossa comunidade exclusiva de membros e participar das reuniões mensais de mentoria de vendas.
+                </p>
               </div>
             </div>
           </div>
@@ -1079,22 +1231,6 @@ export default function Dashboard({ user, onLogout }) {
                         <table className="w-full text-left border-collapse text-xs">
                           <thead>
                             <tr className="bg-slate-900/40 text-slate-350 border-b border-slate-800/80 font-semibold">
-                              <th className="p-4 w-10 text-center">
-                                <input
-                                  type="checkbox"
-                                  className="rounded border-slate-800 bg-slate-950/50 text-indigo-600 focus:ring-indigo-500/50 cursor-pointer w-4 h-4"
-                                  checked={filteredResults.length > 0 && filteredResults.every(item => selectedLeads.includes(results.indexOf(item)))}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      const currentFilteredIndices = filteredResults.map(item => results.indexOf(item));
-                                      setSelectedLeads(prev => Array.from(new Set([...prev, ...currentFilteredIndices])));
-                                    } else {
-                                      const currentFilteredIndices = filteredResults.map(item => results.indexOf(item));
-                                      setSelectedLeads(prev => prev.filter(idx => !currentFilteredIndices.includes(idx)));
-                                    }
-                                  }}
-                                />
-                              </th>
                               <th className="p-4">Nome do Local</th>
                               <th className="p-4">Endereço</th>
                               <th className="p-4">Telefone</th>
@@ -1111,21 +1247,6 @@ export default function Dashboard({ user, onLogout }) {
                                   onClick={() => setSelectedPlace(place)}
                                   className="hover:bg-slate-800/30 text-slate-305 transition-colors cursor-pointer"
                                 >
-                                  <td className="p-4 w-10 text-center" onClick={(e) => e.stopPropagation()}>
-                                    <input
-                                      type="checkbox"
-                                      className="rounded border-slate-800 bg-slate-950/50 text-indigo-600 focus:ring-indigo-500/50 cursor-pointer w-4 h-4"
-                                      checked={selectedLeads.includes(results.indexOf(place))}
-                                      onChange={(e) => {
-                                        const leadIdx = results.indexOf(place);
-                                        if (e.target.checked) {
-                                          setSelectedLeads(prev => [...prev, leadIdx]);
-                                        } else {
-                                          setSelectedLeads(prev => prev.filter(idx => idx !== leadIdx));
-                                        }
-                                      }}
-                                    />
-                                  </td>
                                   <td className="p-4 font-semibold text-white max-w-[150px] truncate">
                                     {place.title}
                                   </td>
@@ -1169,21 +1290,38 @@ export default function Dashboard({ user, onLogout }) {
                                     )}
                                   </td>
                                   <td className="p-4 text-center" onClick={(e) => e.stopPropagation()}>
-                                    <a
-                                      href={`https://wa.me/${getCleanPhone(place.phone)}`}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      className="px-2.5 py-1 bg-green-600/15 border border-green-500/30 text-green-400 hover:bg-green-600 hover:text-white rounded-lg text-[10px] font-semibold transition-all inline-flex items-center gap-1 cursor-pointer"
-                                      title="Enviar mensagem individual"
-                                    >
-                                      📱 WhatsApp
-                                    </a>
+                                    {userPlan === 'quarterly' || userPlan === 'annual' ? (
+                                      <a
+                                        href={`https://wa.me/${getCleanPhone(place.phone)}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="px-2.5 py-1 bg-green-600/15 border border-green-500/30 text-green-400 hover:bg-green-600 hover:text-white rounded-lg text-[10px] font-semibold transition-all inline-flex items-center gap-1 cursor-pointer"
+                                        title="Enviar mensagem individual"
+                                      >
+                                        📱 WhatsApp
+                                      </a>
+                                    ) : (
+                                      <button
+                                        onClick={() => {
+                                          setLockModal({
+                                            isOpen: true,
+                                            title: 'Funcionalidade Bloqueada',
+                                            message: 'Faça upgrade do seu plano para liberar esta funcionalidade.'
+                                          });
+                                        }}
+                                        className="px-2.5 py-1 bg-slate-800/50 border border-slate-700/50 text-slate-450 hover:text-slate-300 rounded-lg text-[10px] font-semibold transition-all inline-flex items-center gap-1 cursor-pointer opacity-70"
+                                        title="Recurso bloqueado para seu plano"
+                                      >
+                                        <Lock className="w-3 h-3 text-slate-500" />
+                                        <span>WhatsApp</span>
+                                      </button>
+                                    )}
                                   </td>
                                 </tr>
                               ))
                             ) : (
                               <tr>
-                                <td colSpan="7" className="p-8 text-center text-slate-500">
+                                <td colSpan="6" className="p-8 text-center text-slate-500">
                                   Nenhum resultado corresponde ao filtro "{filterText}"
                                 </td>
                               </tr>
@@ -1191,65 +1329,6 @@ export default function Dashboard({ user, onLogout }) {
                           </tbody>
                         </table>
                       </div>
-
-                      {/* Bulk Dispatch Panel */}
-                      {selectedLeads.length > 0 && (
-                        <div className="p-4 mt-6 bg-slate-950/40 border border-indigo-500/20 rounded-2xl animate-fade-in space-y-4">
-                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                            <div>
-                              <h4 className="text-white text-xs font-bold flex items-center gap-2">
-                                <MessageSquare className="w-4 h-4 text-indigo-400" />
-                                Disparo em Massa para WhatsApp
-                              </h4>
-                              <p className="text-[10px] text-slate-400 mt-0.5">
-                                {selectedLeads.length} lead(s) selecionado(s) para prospecção.
-                              </p>
-                            </div>
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => setSelectedLeads([])}
-                                className="px-3 py-1.5 border border-slate-800 hover:bg-slate-805 text-slate-400 hover:text-white rounded-lg text-[10px] font-semibold transition-all cursor-pointer"
-                                disabled={dispatching}
-                              >
-                                Limpar Seleção
-                              </button>
-                              <button
-                                onClick={handleBulkDispatch}
-                                className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-semibold transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1"
-                                disabled={dispatching}
-                              >
-                                {dispatching ? (
-                                  <>
-                                    <RefreshCw className="w-3 h-3 animate-spin" />
-                                    Disparando...
-                                  </>
-                                ) : (
-                                  <>
-                                    <Send className="w-3 h-3" />
-                                    Disparar para Selecionados
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center text-[10px]">
-                              <label className="text-slate-300 font-semibold">Mensagem do Modelo</label>
-                              <span className="text-slate-500 font-mono">
-                                Variáveis: <code className="text-indigo-300 bg-slate-900 px-1 py-0.5 rounded">{`{nome}`}</code>, <code className="text-indigo-300 bg-slate-900 px-1 py-0.5 rounded">{`{endereco}`}</code>, <code className="text-indigo-300 bg-slate-900 px-1 py-0.5 rounded">{`{telefone}`}</code>
-                              </span>
-                            </div>
-                            <textarea
-                              className="w-full p-3 bg-slate-950/50 border border-slate-800 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl text-xs text-white placeholder-slate-650 outline-none transition-all resize-none min-h-[80px]"
-                              value={messageTemplate}
-                              onChange={(e) => setMessageTemplate(e.target.value)}
-                              disabled={dispatching}
-                              placeholder="Use as variáveis: {nome}, {endereco}, {telefone}"
-                            />
-                          </div>
-                        </div>
-                      )}
                     </div>
                   ) : (
                     <div className="flex-1 flex flex-col justify-center items-center py-12 text-center">
@@ -1323,11 +1402,15 @@ export default function Dashboard({ user, onLogout }) {
                   period: '/mês',
                   description: 'Ideal para testar a ferramenta e buscar primeiros leads.',
                   features: [
-                    'Até 500 leads por mês',
-                    'Acesso completo ao Google Places Crawler',
-                    'Filtro automático de leads sem website',
-                    'Exportação ilimitada para CSV',
-                    'Painel de disparos sequenciais'
+                    { text: 'Até 500 leads por mês', included: true },
+                    { text: 'Acesso completo ao Google Places Crawler', included: true },
+                    { text: 'Filtro automático de leads sem website', included: true },
+                    { text: 'Exportação ilimitada para CSV', included: true },
+                    { text: 'Disparador inteligente', included: false },
+                    { text: 'Suporte prioritário', included: false },
+                    { text: 'Curso completo de renda extra', included: false },
+                    { text: 'Grupo VIP de suporte', included: false },
+                    { text: 'Reuniões mensais com estratégias', included: false }
                   ],
                   recommended: false,
                   buttonText: 'Testar agora',
@@ -1340,13 +1423,16 @@ export default function Dashboard({ user, onLogout }) {
                   subPrice: 'equivalente a R$1,08/dia',
                   description: 'O melhor custo-benefício para aceleração de prospecção.',
                   features: [
-                    'Até 1.500 leads por mês',
-                    'Acesso completo ao Google Places Crawler',
-                    'Filtro automático de leads sem website',
-                    'Exportação ilimitada para CSV',
-                    'Painel de disparos sequenciais',
-                    'Suporte prioritário',
-                    'R$97 ao invés de R$141 — economize R$44'
+                    { text: 'Até 1.500 leads por mês', included: true },
+                    { text: 'Acesso completo ao Google Places Crawler', included: true },
+                    { text: 'Filtro automático de leads sem website', included: true },
+                    { text: 'Exportação ilimitada para CSV', included: true },
+                    { text: 'Disparador inteligente', included: true },
+                    { text: 'Suporte prioritário', included: true },
+                    { text: 'Curso completo de renda extra', included: true },
+                    { text: 'Grupo VIP de suporte', included: false },
+                    { text: 'Reuniões mensais com estratégias', included: false },
+                    { text: 'R$97 ao invés de R$141 — economize R$44', included: true }
                   ],
                   recommended: true,
                   buttonText: 'Quero economizar',
@@ -1359,14 +1445,17 @@ export default function Dashboard({ user, onLogout }) {
                   subPrice: 'equivalente a R$0,54/dia',
                   description: 'Para agências e equipes que buscam resultados de longo prazo.',
                   features: [
-                    'Leads ilimitados',
-                    'Acesso completo ao Google Places Crawler',
-                    'Filtro automático de leads sem website',
-                    'Exportação ilimitada para CSV',
-                    'Painel de disparos sequenciais',
-                    'Suporte prioritário',
-                    'Acesso antecipado a novidades',
-                    'R$197 ao invés de R$564 — economize R$367'
+                    { text: 'Leads ilimitados', included: true },
+                    { text: 'Acesso completo ao Google Places Crawler', included: true },
+                    { text: 'Filtro automático de leads sem website', included: true },
+                    { text: 'Exportação ilimitada para CSV', included: true },
+                    { text: 'Disparador inteligente', included: true },
+                    { text: 'Suporte prioritário', included: true },
+                    { text: 'Curso completo de renda extra', included: true },
+                    { text: 'Grupo VIP de suporte', included: true },
+                    { text: 'Reuniões mensais com estratégias', included: true },
+                    { text: 'Acesso antecipado a novidades', included: true },
+                    { text: 'R$197 ao invés de R$564 — economize R$367', included: true }
                   ],
                   recommended: false,
                   buttonText: 'Garantir o melhor preço',
@@ -1406,8 +1495,14 @@ export default function Dashboard({ user, onLogout }) {
                     <ul className="space-y-3 border-t border-slate-800/50 pt-5 text-xs text-slate-300">
                       {plan.features.map((feat, fIdx) => (
                         <li key={fIdx} className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                          <span>{feat}</span>
+                          {feat.included ? (
+                            <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                          ) : (
+                            <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                          )}
+                          <span className={feat.included ? 'text-slate-300' : 'text-slate-500'}>
+                            {feat.text}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -1605,6 +1700,38 @@ export default function Dashboard({ user, onLogout }) {
                 Ver no Google
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lock Warning Modal */}
+      {lockModal.isOpen && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="w-full max-w-md bg-slate-900 border border-slate-850 rounded-2xl p-6 shadow-2xl animate-scale-up text-center space-y-6">
+            <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto">
+              <Lock className="w-8 h-8" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold font-display text-white mb-2">{lockModal.title}</h3>
+              <p className="text-slate-400 text-xs leading-relaxed">{lockModal.message}</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                onClick={() => setLockModal(prev => ({ ...prev, isOpen: false }))}
+                className="w-full py-2.5 border border-slate-800 hover:bg-slate-855 text-slate-300 hover:text-white text-xs font-semibold rounded-xl transition-all cursor-pointer"
+              >
+                Voltar
+              </button>
+              <button
+                onClick={() => {
+                  setLockModal(prev => ({ ...prev, isOpen: false }));
+                  setActiveTab('plans');
+                }}
+                className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl transition-all shadow-lg hover:shadow-blue-500/20 cursor-pointer"
+              >
+                Ver Planos
+              </button>
             </div>
           </div>
         </div>
