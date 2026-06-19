@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, Eye, EyeOff, UserPlus, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
-export default function Register({ onNavigateToLogin }) {
+export default function Register({ onLoginSuccess, onNavigateToLogin }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +14,7 @@ export default function Register({ onNavigateToLogin }) {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -22,7 +23,6 @@ export default function Register({ onNavigateToLogin }) {
       return;
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError('Por favor, insira um e-mail válido.');
@@ -41,36 +41,48 @@ export default function Register({ onNavigateToLogin }) {
 
     setLoading(true);
 
-    // Mock network latency for premium feel
-    setTimeout(() => {
-      try {
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        
-        // Check if email already registered
-        const userExists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
-        if (userExists) {
-          setError('Este e-mail já está sendo utilizado.');
-          setLoading(false);
-          return;
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: name
+          }
         }
+      });
 
-        // Add user
-        const newUser = { name, email, password };
-        users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(users));
-
-        setSuccess(true);
+      if (error) {
+        if (error.message.includes('User already registered')) {
+          setError('Este e-mail já está sendo utilizado.');
+        } else {
+          setError(`Erro ao criar conta: ${error.message}`);
+        }
         setLoading(false);
+        return;
+      }
 
-        // Auto redirect to login after 1.5 seconds
+      setSuccess(true);
+      setLoading(false);
+
+      // If Supabase auto-authenticates the user after signup, redirect directly to dashboard
+      if (data?.session) {
+        setTimeout(() => {
+          onLoginSuccess({
+            name: data.session.user.user_metadata?.name || data.session.user.email,
+            email: data.session.user.email
+          });
+        }, 1500);
+      } else {
+        // Otherwise, ask them to verify and navigate back to login after 3 seconds
         setTimeout(() => {
           onNavigateToLogin();
-        }, 1500);
-      } catch (err) {
-        setError('Ocorreu um erro ao cadastrar a conta. Tente novamente.');
-        setLoading(false);
+        }, 3000);
       }
-    }, 1000);
+    } catch (err) {
+      setError('Ocorreu um erro ao cadastrar a conta. Tente novamente.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -82,7 +94,7 @@ export default function Register({ onNavigateToLogin }) {
           </div>
           <h2 className="text-2xl font-bold font-display text-white mb-2">Conta Criada!</h2>
           <p className="text-slate-400 text-sm">
-            Seu cadastro foi realizado com sucesso. Redirecionando para a tela de login...
+            Seu cadastro foi realizado com sucesso. Redirecionando...
           </p>
         </div>
       ) : (

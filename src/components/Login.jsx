@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, LogIn, ArrowRight } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function Login({ onLoginSuccess, onNavigateToRegister }) {
   const [email, setEmail] = useState('');
@@ -8,7 +9,7 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -19,33 +20,32 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }) {
 
     setLoading(true);
 
-    // Mock network latency for premium feel
-    setTimeout(() => {
-      try {
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
 
-        if (!user) {
-          setError('Usuário não encontrado. Verifique seu e-mail ou crie uma conta.');
-          setLoading(false);
-          return;
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          setError('Credenciais inválidas. Verifique seu e-mail e senha.');
+        } else {
+          setError(`Erro ao fazer login: ${error.message}`);
         }
-
-        if (user.password !== password) {
-          setError('Senha incorreta. Tente novamente.');
-          setLoading(false);
-          return;
-        }
-
-        // Save session
-        const sessionUser = { name: user.name, email: user.email };
-        localStorage.setItem('currentUser', JSON.stringify(sessionUser));
-        onLoginSuccess(sessionUser);
-      } catch (err) {
-        setError('Ocorreu um erro ao processar o login. Tente novamente.');
         setLoading(false);
+        return;
       }
-    }, 800);
+
+      if (data.user) {
+        onLoginSuccess({
+          name: data.user.user_metadata?.name || data.user.email,
+          email: data.user.email
+        });
+      }
+    } catch (err) {
+      setError('Ocorreu um erro ao processar o login. Tente novamente.');
+      setLoading(false);
+    }
   };
 
   return (
