@@ -638,7 +638,7 @@ export default function Dashboard({ user, onLogout }) {
               <h1 className="text-base font-bold font-display text-white tracking-tight">
                 Gera Leads
               </h1>
-              <span className="text-[10px] text-slate-500 block mt-0.5">Google Places Prospect</span>
+              <span className="text-[10px] text-slate-500 block mt-0.5">Prospectador de Leads</span>
             </div>
           </div>
 
@@ -1464,9 +1464,9 @@ export default function Dashboard({ user, onLogout }) {
                     { text: 'Disparador inteligente', included: true },
                     { text: 'Suporte prioritário', included: true },
                     { text: 'Curso completo de renda extra', included: true },
+                    { text: 'R$97 ao invés de R$141 — economize R$44', included: true },
                     { text: 'Grupo VIP de suporte', included: false },
-                    { text: 'Reuniões mensais com estratégias', included: false },
-                    { text: 'R$97 ao invés de R$141 — economize R$44', included: true }
+                    { text: 'Reuniões mensais com estratégias', included: false }
                   ],
                   recommended: true,
                   buttonText: 'Quero economizar',
