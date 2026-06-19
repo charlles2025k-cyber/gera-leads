@@ -48,11 +48,18 @@ export default function Dashboard({ user, onLogout }) {
   // User Profile from Supabase
   const [profile, setProfile] = useState({
     plan: 'free',
-    plan_expires_at: null
+    plan_expires_at: null,
+    plan_type: null
   });
   const [loadingProfile, setLoadingProfile] = useState(true);
 
-  // Load API key, profile, and history on mount
+  // Lead Usage Tracking State
+  const [usageTracking, setUsageTracking] = useState({
+    leads_used: 0,
+    period_start: null
+  });
+
+  // Load API key, profile, usage and history on mount
   useEffect(() => {
     const savedKey = localStorage.getItem('apify_api_key') || '';
     setApiKey(savedKey);
@@ -60,8 +67,31 @@ export default function Dashboard({ user, onLogout }) {
       setApiKeySaved(true);
     }
 
-    fetchUserProfile();
-    fetchSearchHistory();
+    const initAuthAndData = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        fetchUserProfile();
+        fetchUsageTracking();
+        fetchSearchHistory();
+      }
+    };
+
+    initAuthAndData();
+
+    // Subscribe to auth state changes to reload when user signs in
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        fetchUserProfile();
+        fetchUsageTracking();
+        fetchSearchHistory();
+      }
+    });
+
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
   }, []);
 
   // Fetch user profile from Supabase profiles table
@@ -72,7 +102,7 @@ export default function Dashboard({ user, onLogout }) {
       if (session) {
         const { data, error } = await supabase
           .from('profiles')
-          .select('id, plan, plan_expires_at')
+          .select('id, plan, plan_expires_at, plan_type')
           .eq('id', session.user.id)
           .maybeSingle();
 
@@ -83,7 +113,8 @@ export default function Dashboard({ user, onLogout }) {
         } else {
           setProfile({
             plan: 'free',
-            plan_expires_at: null
+            plan_expires_at: null,
+            plan_type: null
           });
         }
       }
@@ -91,10 +122,34 @@ export default function Dashboard({ user, onLogout }) {
       console.error("Erro ao carregar perfil do Supabase:", err);
       setProfile({
         plan: 'free',
-        plan_expires_at: null
+        plan_expires_at: null,
+        plan_type: null
       });
     } finally {
       setLoadingProfile(false);
+    }
+  };
+
+  // Fetch usage tracking details from Supabase
+  const fetchUsageTracking = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data, error } = await supabase
+          .from('usage_tracking')
+          .select('leads_used, period_start')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        if (data) {
+          setUsageTracking(data);
+        } else {
+          setUsageTracking({ leads_used: 0, period_start: null });
+        }
+      }
+    } catch (err) {
+      console.error("Erro ao carregar tracking de uso do Supabase:", err);
     }
   };
 
@@ -113,6 +168,39 @@ export default function Dashboard({ user, onLogout }) {
     if (!profile || profile.plan === 'free') return false;
     return daysRemaining !== null && daysRemaining <= 0;
   }, [profile, daysRemaining]);
+
+  // Compute plan limit based on plan column
+  const planLimit = useMemo(() => {
+    const plan = (profile?.plan || 'free').trim();
+    if (plan === 'monthly') return 500;
+    if (plan === 'quarterly') return 1500;
+    if (plan === 'annual') return Infinity;
+    return 0;
+  }, [profile]);
+
+  // Translate plan codes to user-friendly Portuguese names
+  const planNamePt = useMemo(() => {
+    const plan = (profile?.plan || 'free').trim();
+    if (plan === 'monthly') return 'Mensal';
+    if (plan === 'quarterly') return 'Trimestral';
+    if (plan === 'annual') return 'Anual';
+    return 'Gratuito';
+  }, [profile]);
+
+  // Compute progress percent for limit bar
+  const progressPercent = useMemo(() => {
+    if (planLimit === Infinity || planLimit === 0) return 0;
+    return ((usageTracking.leads_used || 0) / planLimit) * 100;
+  }, [usageTracking, planLimit]);
+
+  // Determine progress bar and text styling based on thresholds (80% and 100%)
+  const { progressBarColor, progressTextColor } = useMemo(() => {
+    const used = usageTracking.leads_used || 0;
+    if (planLimit === Infinity) return { progressBarColor: 'bg-indigo-500', progressTextColor: 'text-indigo-400' };
+    if (used >= planLimit) return { progressBarColor: 'bg-red-500', progressTextColor: 'text-red-400' };
+    if (used >= planLimit * 0.8) return { progressBarColor: 'bg-amber-500', progressTextColor: 'text-amber-400' };
+    return { progressBarColor: 'bg-indigo-500', progressTextColor: 'text-indigo-400' };
+  }, [usageTracking, planLimit]);
 
   // Fetch search history from Supabase
   const fetchSearchHistory = async () => {
@@ -247,9 +335,91 @@ export default function Dashboard({ user, onLogout }) {
     const maxCount = Math.min(100, Math.max(1, parseInt(maxPlaces) || 10));
 
     setLoading(true);
-    setProgressMsg('Enviando requisição síncrona para o Apify (isso pode levar até 2 minutos)...');
+    setProgressMsg('Verificando limites de uso do plano...');
     
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Usuário não autenticado. Por favor, faça login novamente.');
+      }
+      const userId = session.user.id;
+
+      // 1. Get the user's plan from profiles
+      const { data: profileData, error: profileErr } = await supabase
+        .from('profiles')
+        .select('plan')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (profileErr) throw profileErr;
+      const plan = (profileData?.plan || 'free').trim();
+
+      // Determine the limit based on plan
+      let planLimit = 0;
+      if (plan === 'monthly') planLimit = 500;
+      else if (plan === 'quarterly') planLimit = 1500;
+      else if (plan === 'annual') planLimit = Infinity;
+
+      // 2. Get the user's current usage tracking status
+      let { data: usage, error: usageErr } = await supabase
+        .from('usage_tracking')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (usageErr) throw usageErr;
+
+      const now = new Date();
+
+      if (!usage) {
+        // Create new usage record if none exists
+        const { data: newUsage, error: insertErr } = await supabase
+          .from('usage_tracking')
+          .insert({
+            user_id: userId,
+            leads_used: 0,
+            period_start: now.toISOString(),
+            created_at: now.toISOString()
+          })
+          .select()
+          .single();
+
+        if (insertErr) throw insertErr;
+        usage = newUsage;
+      } else {
+        // Reset logic: check if period_start is older than 30 days
+        const periodStart = new Date(usage.period_start);
+        const diffTime = Math.abs(now - periodStart);
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        if (diffDays >= 30) {
+          const { data: resetUsage, error: updateErr } = await supabase
+            .from('usage_tracking')
+            .update({
+              leads_used: 0,
+              period_start: now.toISOString()
+            })
+            .eq('id', usage.id)
+            .select()
+            .single();
+
+          if (updateErr) throw updateErr;
+          usage = resetUsage;
+        }
+      }
+
+      const currentLeadsUsed = usage.leads_used || 0;
+      const requestedAmount = maxCount;
+
+      // 3. Check if current usage + requested amount exceeds the limit
+      if (planLimit !== Infinity && (currentLeadsUsed + requestedAmount) > planLimit) {
+        setError('Você atingiu o limite do seu plano. Faça upgrade para continuar buscando leads.');
+        setLoading(false);
+        return;
+      }
+
+      // Proceed with the search
+      setProgressMsg('Enviando requisição síncrona para o Apify (isso pode levar até 2 minutos)...');
+
       const response = await fetch(
         `https://api.apify.com/v2/acts/compass~crawler-google-places/run-sync-get-dataset-items?token=${apiKey}`,
         {
@@ -286,18 +456,31 @@ export default function Dashboard({ user, onLogout }) {
         }));
         setResults(normalized);
 
+        // 4. Increment leads_used by the number of results returned
+        const newLeadsUsed = currentLeadsUsed + normalized.length;
+        const { error: incrementErr } = await supabase
+          .from('usage_tracking')
+          .update({ leads_used: newLeadsUsed })
+          .eq('id', usage.id);
+
+        if (incrementErr) {
+          console.error("Erro ao atualizar o uso de leads:", incrementErr);
+        } else {
+          setUsageTracking(prev => ({
+            ...prev,
+            leads_used: newLeadsUsed
+          }));
+        }
+
         // Save to Supabase searches log
         try {
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session) {
-            await supabase.from('lead_searches').insert({
-              user_id: session.user.id,
-              search_term: searchQuery.trim(),
-              location: locationQuery.trim(),
-              total_results: normalized.length
-            });
-            fetchSearchHistory();
-          }
+          await supabase.from('lead_searches').insert({
+            user_id: userId,
+            search_term: searchQuery.trim(),
+            location: locationQuery.trim(),
+            total_results: normalized.length
+          });
+          fetchSearchHistory();
         } catch (dbErr) {
           console.error("Erro ao salvar busca no Supabase:", dbErr);
         }
@@ -721,6 +904,29 @@ export default function Dashboard({ user, onLogout }) {
               
               {/* Form */}
               <div className="lg:col-span-4 space-y-6">
+                {/* Visual Usage Indicator */}
+                <div className="p-6 rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 shadow-xl space-y-4">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-350 font-semibold">Consumo do Plano</span>
+                    <span className={`font-mono text-xs font-bold ${progressTextColor}`}>
+                      {profile.plan === 'annual' ? 'Ilimitado' : `${usageTracking.leads_used || 0} / ${planLimit} leads`}
+                    </span>
+                  </div>
+                  {profile.plan !== 'annual' && (
+                    <div className="w-full bg-slate-950/50 rounded-full h-2.5 border border-slate-850 overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-500 ${progressBarColor}`}
+                        style={{ width: `${Math.min(100, progressPercent)}%` }}
+                      />
+                    </div>
+                  )}
+                  <p className="text-[10px] text-slate-500 leading-relaxed">
+                    {profile.plan === 'annual' 
+                      ? 'Seu plano anual inclui buscas ilimitadas de leads.'
+                      : `Limite mensal do seu plano ${planNamePt}.`}
+                  </p>
+                </div>
+
                 <div className="p-6 rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 shadow-xl">
                   <div className="flex items-center gap-2 mb-6 border-b border-slate-800 pb-3">
                     <Sliders className="w-5 h-5 text-indigo-400" />
@@ -1081,6 +1287,35 @@ export default function Dashboard({ user, onLogout }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+              {/* Inline style for the pulsing animation of recommended card */}
+              <style>{`
+                @keyframes pulseGlow {
+                  0% {
+                    transform: scale(1.02);
+                    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.15), 0 4px 6px -4px rgba(99, 102, 241, 0.15), 0 0 0 0px rgba(99, 102, 241, 0.4);
+                  }
+                  50% {
+                    transform: scale(1.035);
+                    box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.3), 0 8px 10px -6px rgba(99, 102, 241, 0.3), 0 0 15px 5px rgba(99, 102, 241, 0.75);
+                  }
+                  100% {
+                    transform: scale(1.02);
+                    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.15), 0 4px 6px -4px rgba(99, 102, 241, 0.15), 0 0 0 0px rgba(99, 102, 241, 0.4);
+                  }
+                }
+
+                .pulse-trimestral {
+                  animation: pulseGlow 2s ease-in-out infinite;
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                  .pulse-trimestral {
+                    animation: none;
+                    transform: scale(1.02);
+                  }
+                }
+              `}</style>
+
               {[
                 {
                   name: 'Mensal',
@@ -1088,47 +1323,61 @@ export default function Dashboard({ user, onLogout }) {
                   period: '/mês',
                   description: 'Ideal para testar a ferramenta e buscar primeiros leads.',
                   features: [
+                    'Até 500 leads por mês',
                     'Acesso completo ao Google Places Crawler',
                     'Filtro automático de leads sem website',
                     'Exportação ilimitada para CSV',
                     'Painel de disparos sequenciais'
                   ],
-                  recommended: false
+                  recommended: false,
+                  buttonText: 'Testar agora',
+                  link: 'https://pay.cakto.com.br/mihqmub_933107'
                 },
                 {
                   name: 'Trimestral',
                   price: 'R$ 97',
                   period: '/trimestre',
+                  subPrice: 'equivalente a R$1,08/dia',
                   description: 'O melhor custo-benefício para aceleração de prospecção.',
                   features: [
+                    'Até 1.500 leads por mês',
                     'Acesso completo ao Google Places Crawler',
                     'Filtro automático de leads sem website',
                     'Exportação ilimitada para CSV',
                     'Painel de disparos sequenciais',
-                    'Desconto equivalente a 30% off'
+                    'Suporte prioritário',
+                    'R$97 ao invés de R$141 — economize R$44'
                   ],
-                  recommended: true
+                  recommended: true,
+                  buttonText: 'Quero economizar',
+                  link: 'https://pay.cakto.com.br/36bmrgk'
                 },
                 {
                   name: 'Anual',
                   price: 'R$ 197',
                   period: '/ano',
+                  subPrice: 'equivalente a R$0,54/dia',
                   description: 'Para agências e equipes que buscam resultados de longo prazo.',
                   features: [
+                    'Leads ilimitados',
                     'Acesso completo ao Google Places Crawler',
                     'Filtro automático de leads sem website',
                     'Exportação ilimitada para CSV',
                     'Painel de disparos sequenciais',
-                    'Desconto equivalente a 65% off'
+                    'Suporte prioritário',
+                    'Acesso antecipado a novidades',
+                    'R$197 ao invés de R$564 — economize R$367'
                   ],
-                  recommended: false
+                  recommended: false,
+                  buttonText: 'Garantir o melhor preço',
+                  link: 'https://pay.cakto.com.br/cx86ktu'
                 }
               ].map((plan, idx) => (
                 <div 
                   key={idx}
                   className={`p-6 rounded-2xl bg-slate-900/60 backdrop-blur-xl border flex flex-col justify-between transition-all relative ${
                     plan.recommended 
-                      ? 'border-indigo-500 shadow-lg shadow-indigo-500/10 scale-[1.02]' 
+                      ? 'border-indigo-500 pulse-trimestral' 
                       : 'border-slate-800/80 shadow-md'
                   }`}
                 >
@@ -1142,9 +1391,16 @@ export default function Dashboard({ user, onLogout }) {
                     <h3 className="text-base font-bold text-white">{plan.name}</h3>
                     <p className="text-slate-400 text-xs mt-2 leading-relaxed min-h-[40px]">{plan.description}</p>
                     
-                    <div className="my-6 flex items-baseline">
-                      <span className="text-3xl font-extrabold text-white">{plan.price}</span>
-                      <span className="text-slate-400 text-xs font-semibold ml-1">{plan.period}</span>
+                    <div className="my-6">
+                      <div className="flex items-baseline">
+                        <span className="text-3xl font-extrabold text-white">{plan.price}</span>
+                        <span className="text-slate-400 text-xs font-semibold ml-1">{plan.period}</span>
+                      </div>
+                      {plan.subPrice && (
+                        <div className="text-[10px] text-slate-500 mt-1 font-medium">
+                          {plan.subPrice}
+                        </div>
+                      )}
                     </div>
 
                     <ul className="space-y-3 border-t border-slate-800/50 pt-5 text-xs text-slate-300">
@@ -1157,15 +1413,16 @@ export default function Dashboard({ user, onLogout }) {
                     </ul>
                   </div>
 
-                  <button
-                    className={`w-full py-2.5 mt-8 text-xs font-bold rounded-xl transition-all active:scale-[0.98] cursor-pointer ${
+                  <a
+                    href={plan.link}
+                    className={`w-full text-center block py-2.5 mt-8 text-xs font-bold rounded-xl transition-all active:scale-[0.98] cursor-pointer ${
                       plan.recommended
                         ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow shadow-blue-500/10'
                         : 'bg-slate-800 hover:bg-slate-750 text-slate-200'
                     }`}
                   >
-                    Assinar Plano
-                  </button>
+                    {plan.buttonText}
+                  </a>
                 </div>
               ))}
             </div>

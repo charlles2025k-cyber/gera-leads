@@ -8,6 +8,43 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showResetInput, setShowResetInput] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState('');
+  const [resetSuccess, setResetSuccess] = useState('');
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setResetError('');
+    setResetSuccess('');
+
+    if (!resetEmail) {
+      setResetError('Por favor, digite seu e-mail.');
+      return;
+    }
+
+    setResetLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: 'https://gera-leads.vercel.app/redefinir-senha',
+      });
+
+      if (error) {
+        setResetError(`Erro ao enviar e-mail: ${error.message}`);
+        setResetLoading(false);
+        return;
+      }
+
+      setResetSuccess('Enviamos um link para seu email. Verifique também o spam.');
+      setResetEmail('');
+    } catch (err) {
+      setResetError('Ocorreu um erro ao enviar o link. Tente novamente.');
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -121,6 +158,66 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }) {
           </div>
         </div>
 
+        <div className="flex justify-end">
+          <button
+            type="button"
+            className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors mt-1 focus:outline-none"
+            onClick={() => setShowResetInput(!showResetInput)}
+            disabled={loading}
+          >
+            Esqueci minha senha
+          </button>
+        </div>
+
+        {showResetInput && (
+          <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-800 space-y-3 mt-2">
+            <p className="text-xs text-slate-400">
+              Digite seu e-mail para receber o link de recuperação:
+            </p>
+            <input
+              type="email"
+              placeholder="seu-email@dominio.com"
+              className="w-full px-3 py-2 bg-slate-950/50 border border-slate-800 focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/50 rounded-lg text-white placeholder-slate-500 outline-none transition-all text-xs"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              disabled={resetLoading}
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                type="button"
+                className="px-3 py-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+                onClick={() => {
+                  setShowResetInput(false);
+                  setResetEmail('');
+                  setResetError('');
+                  setResetSuccess('');
+                }}
+                disabled={resetLoading}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium disabled:opacity-50"
+                onClick={handleResetPassword}
+                disabled={resetLoading}
+              >
+                {resetLoading ? 'Enviando...' : 'Enviar Link'}
+              </button>
+            </div>
+            {resetError && (
+              <p className="text-xs text-red-400 text-center font-medium mt-1">
+                {resetError}
+              </p>
+            )}
+            {resetSuccess && (
+              <p className="text-xs text-green-400 text-center font-medium mt-1">
+                {resetSuccess}
+              </p>
+            )}
+          </div>
+        )}
+
         <button
           type="submit"
           className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-blue-500/20 active:scale-[0.98] flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-2"
@@ -136,20 +233,6 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }) {
           )}
         </button>
       </form>
-
-      <div className="mt-8 text-center">
-        <p className="text-slate-400 text-sm">
-          Não tem uma conta?{' '}
-          <button
-            type="button"
-            className="text-blue-400 hover:text-blue-300 font-semibold transition-colors focus:outline-none"
-            onClick={onNavigateToRegister}
-            disabled={loading}
-          >
-            Cadastre-se grátis
-          </button>
-        </p>
-      </div>
     </div>
   );
 }
