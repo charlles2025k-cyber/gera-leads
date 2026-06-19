@@ -988,15 +988,23 @@ export default function Dashboard({ user, onLogout }) {
               <h2 className="text-2xl font-bold font-display text-white">Curso Renda Extra</h2>
               <p className="text-slate-400 text-xs mt-1">Aprenda a prospectar e vender para leads sem site</p>
             </div>
-            <div className="p-8 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl text-center space-y-6">
-              <div className="w-16 h-16 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto">
-                <BookOpen className="w-8 h-8" />
+            <div className="p-6 md:p-8 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl space-y-6">
+              <div className="border-b border-slate-800/60 pb-4">
+                <h3 className="text-lg font-bold font-display text-white">Curso Completo de Renda Extra</h3>
+                <p className="text-slate-400 text-xs mt-1">Aprenda a gerar renda extra com prospecção de clientes.</p>
               </div>
-              <div className="space-y-2">
-                <h3 className="text-lg font-bold font-display text-white">Em breve: conteúdo do curso</h3>
-                <p className="text-slate-400 text-xs max-w-lg mx-auto leading-relaxed">
-                  Estamos finalizando as aulas e materiais complementares do método completo para você fechar contratos de criação de sites, gestão de redes sociais e SEO local com os leads prospectados.
-                </p>
+              <div className="w-full aspect-video rounded-xl overflow-hidden border border-slate-800 shadow-2xl">
+                <iframe 
+                  width="100%" 
+                  height="100%" 
+                  src="https://www.youtube.com/embed/3Tfd9RZQqxo?si=Hxna654PM11qmHiD" 
+                  title="YouTube video player" 
+                  frameBorder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                  referrerPolicy="strict-origin-when-cross-origin" 
+                  allowFullScreen
+                  className="w-full h-full"
+                ></iframe>
               </div>
             </div>
           </div>
@@ -1010,14 +1018,24 @@ export default function Dashboard({ user, onLogout }) {
               <p className="text-slate-405 text-xs mt-1">Networking e estratégias exclusivas de fechamento</p>
             </div>
             <div className="p-8 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl text-center space-y-6">
-              <div className="w-16 h-16 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto">
+              <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto">
                 <Users className="w-8 h-8" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-lg font-bold font-display text-white">Em breve: acesso ao Grupo VIP</h3>
+                <h3 className="text-xl font-bold font-display text-white">Grupo VIP de Suporte</h3>
                 <p className="text-slate-400 text-xs max-w-lg mx-auto leading-relaxed">
-                  Em breve você receberá os dados de acesso para ingressar na nossa comunidade exclusiva de membros e participar das reuniões mensais de mentoria de vendas.
+                  Acesse nosso grupo exclusivo no WhatsApp com estratégias, suporte direto e reuniões mensais.
                 </p>
+              </div>
+              <div className="pt-4">
+                <a
+                  href="https://chat.whatsapp.com/DwXUNk5x6YJ1G2KHy8JxKX"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-emerald-950/20 active:scale-[0.98] cursor-pointer"
+                >
+                  Entrar no Grupo VIP
+                </a>
               </div>
             </div>
           </div>
