@@ -26,6 +26,32 @@ function getPlanFromOffer(productName: string) {
   return { plan, days }
 }
 
+async function findOrCreateUser(email: string, name: string) {
+  const { data: users } = await supabase.auth.admin.listUsers()
+  let user = users?.users?.find((u: any) => u.email === email)
+
+  if (user) {
+    return { user, isNew: false }
+  }
+
+  const { data: created, error: createError } = await supabase.auth.admin.createUser({
+    email,
+    email_confirm: true,
+    user_metadata: { name: name || '' },
+  })
+
+  if (createError || !created?.user) {
+    throw new Error(createError?.message || 'Failed to create user')
+  }
+
+  await supabase.auth.admin.generateLink({
+    type: 'recovery',
+    email,
+  })
+
+  return { user: created.user, isNew: true }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -38,64 +64,69 @@ Deno.serve(async (req) => {
   const body = await req.json()
   const event = body?.event
   const email = body?.data?.customer?.email
+  const name = body?.data?.customer?.name
   const productName = body?.data?.offer?.name || body?.data?.product?.name || ''
 
   if (!email) {
     return new Response(JSON.stringify({ error: 'Email not found' }), { headers: corsHeaders, status: 400 })
   }
 
-  const { data: users } = await supabase.auth.admin.listUsers()
-  const user = users?.users?.find((u: any) => u.email === email)
+  try {
+    if (event === 'purchase_approved' || event === 'subscription_renewed') {
+      const { user, isNew } = await findOrCreateUser(email, name)
+      const { plan, days } = getPlanFromOffer(productName)
+      const expires = new Date()
+      expires.setDate(expires.getDate() + days)
 
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'User not found' }), { headers: corsHeaders, status: 404 })
-  }
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ id: user.id, plan, plan_expires_at: expires.toISOString(), status: 'active' })
 
-  if (event === 'purchase_approved' || event === 'subscription_renewed') {
-    const { plan, days } = getPlanFromOffer(productName)
-    const expires = new Date()
-    expires.setDate(expires.getDate() + days)
+      if (error) {
+        return new Response(JSON.stringify({ error: error.message }), { headers: corsHeaders, status: 500 })
+      }
 
-    const { error } = await supabase
-      .from('profiles')
-      .upsert({ id: user.id, plan, plan_expires_at: expires.toISOString(), status: 'active' })
-
-    if (error) {
-      return new Response(JSON.stringify({ error: error.message }), { headers: corsHeaders, status: 500 })
+      return new Response(
+        JSON.stringify({ success: true, action: isNew ? 'created_and_activated' : 'activated', plan, expires }),
+        { headers: corsHeaders, status: 200 }
+      )
     }
 
-    return new Response(JSON.stringify({ success: true, action: 'activated', plan, expires }), { headers: corsHeaders, status: 200 })
-  }
+    const { data: users } = await supabase.auth.admin.listUsers()
+    const user = users?.users?.find((u: any) => u.email === email)
 
-  if (event === 'subscription_canceled') {
-    const { error } = await supabase
-      .from('profiles')
-      .update({ status: 'canceled' })
-      .eq('id', user.id)
-
-    if (error) {
-      return new Response(JSON.stringify({ error: error.message }), { headers: corsHeaders, status: 500 })
+    if (!user) {
+      return new Response(JSON.stringify({ error: 'User not found' }), { headers: corsHeaders, status: 404 })
     }
 
-    return new Response(JSON.stringify({ success: true, action: 'marked_canceled' }), { headers: corsHeaders, status: 200 })
-  }
+    if (event === 'subscription_canceled') {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ status: 'canceled' })
+        .eq('id', user.id)
 
-  if (event === 'refund' || event === 'chargeback') {
-    const { error } = await supabase
-      .from('profiles')
-      .update({ plan: 'none', plan_expires_at: new Date().toISOString(), status: 'revoked' })
-      .eq('id', user.id)
+      if (error) {
+        return new Response(JSON.stringify({ error: error.message }), { headers: corsHeaders, status: 500 })
+      }
 
-    if (error) {
-      return new Response(JSON.stringify({ error: error.message }), { headers: corsHeaders, status: 500 })
+      return new Response(JSON.stringify({ success: true, action: 'marked_canceled' }), { headers: corsHeaders, status: 200 })
     }
 
-    return new Response(JSON.stringify({ success: true, action: 'revoked' }), { headers: corsHeaders, status: 200 })
-  }
+    if (event === 'refund' || event === 'chargeback') {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ plan: 'none', plan_expires_at: new Date().toISOString(), status: 'revoked' })
+        .eq('id', user.id)
 
-  if (event === 'purchase_refused' || event === 'subscription_renewal_refused') {
-    return new Response(JSON.stringify({ success: true, action: 'ignored', event }), { headers: corsHeaders, status: 200 })
-  }
+      if (error) {
+        return new Response(JSON.stringify({ error: error.message }), { headers: corsHeaders, status: 500 })
+      }
 
-  return new Response(JSON.stringify({ success: true, action: 'skipped', event }), { headers: corsHeaders, status: 200 })
+      return new Response(JSON.stringify({ success: true, action: 'revoked' }), { headers: corsHeaders, status: 200 })
+    }
+
+    return new Response(JSON.stringify({ success: true, action: 'skipped', event }), { headers: corsHeaders, status: 200 })
+  } catch (err: any) {
+    return new Response(JSON.stringify({ error: err.message }), { headers: corsHeaders, status: 500 })
+  }
 }, { verifyJWT: false })

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Register from './components/Register';
+import ResetPassword from './components/ResetPassword';
 import Dashboard from './components/Dashboard';
 import { supabase } from './lib/supabase';
 
@@ -8,6 +9,16 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [view, setView] = useState('login'); // 'login' | 'register'
   const [initLoading, setInitLoading] = useState(true);
+  const [path, setPath] = useState(window.location.pathname);
+
+  // Sync route path state on browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      setPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Check active session on mount and subscribe to changes
   useEffect(() => {
@@ -78,6 +89,29 @@ export default function App() {
           <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
           <span className="text-slate-400 text-xs font-semibold tracking-wider uppercase">Carregando...</span>
         </div>
+      </div>
+    );
+  }
+
+  // Route: Reset Password page
+  if (path === '/redefinir-senha') {
+    return (
+      <div className="w-screen min-h-screen flex items-center justify-center p-4">
+        <ResetPassword 
+          onSuccess={async () => {
+            // Sign out of the temporary recovery session so user isn't logged in with it
+            await supabase.auth.signOut();
+            setUser(null);
+            setView('login');
+            window.history.pushState({}, '', '/');
+            setPath('/');
+          }}
+          onCancel={() => {
+            window.history.pushState({}, '', '/');
+            setPath('/');
+            setView('login');
+          }}
+        />
       </div>
     );
   }
