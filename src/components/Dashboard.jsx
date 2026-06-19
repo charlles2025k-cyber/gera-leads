@@ -197,6 +197,15 @@ export default function Dashboard({ user, onLogout }) {
 
   const userPlan = useMemo(() => (profile?.plan || 'free').trim(), [profile]);
 
+  const leadsRemaining = useMemo(() => {
+    const plan = (profile?.plan || 'free').trim();
+    if (plan === 'annual') return 'Ilimitado';
+    const limit = planLimit;
+    const used = usageTracking.leads_used || 0;
+    const remaining = Math.max(0, limit - used);
+    return `${remaining}/${limit} leads restantes`;
+  }, [profile, planLimit, usageTracking]);
+
   // Compute progress percent for limit bar
   const progressPercent = useMemo(() => {
     if (planLimit === Infinity || planLimit === 0) return 0;
@@ -619,26 +628,33 @@ export default function Dashboard({ user, onLogout }) {
       <aside className="hidden md:flex md:w-64 bg-slate-900/40 border-r border-slate-800/80 p-6 flex-col justify-between h-screen sticky top-0 backdrop-blur-xl">
         <div className="space-y-8">
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl text-white shadow-md shadow-blue-500/10">
-              <Layers className="w-5 h-5 animate-pulse-soft" />
-            </div>
+          <div className="flex flex-col items-center justify-center text-center gap-2 mb-6">
+            <img 
+              src="/favicon.svg" 
+              alt="Gera Leads" 
+              className="w-12 h-12 rounded-xl shadow-lg shadow-indigo-500/10 border border-slate-800" 
+            />
             <div>
-              <h1 className="text-base font-bold font-display text-white tracking-tight leading-none">
+              <h1 className="text-base font-bold font-display text-white tracking-tight">
                 Gera Leads
               </h1>
-              <span className="text-[10px] text-slate-500 block mt-1">Google Places Prospect</span>
+              <span className="text-[10px] text-slate-500 block mt-0.5">Google Places Prospect</span>
             </div>
           </div>
 
-          {/* User Profile */}
-          <div className="p-3 bg-slate-950/40 border border-slate-850 rounded-xl flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/10 flex items-center justify-center font-bold text-sm shrink-0">
-              {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+          {/* User Profile Highlighted Card */}
+          <div className="p-3.5 bg-slate-800/30 border border-slate-750 rounded-xl shadow-md flex flex-col gap-1.5">
+            <div className="text-[11px] font-semibold text-slate-200 truncate leading-snug" title={user.name}>
+              {user.name}
             </div>
-            <div className="min-w-0">
-              <span className="text-xs font-bold text-white block truncate leading-none">{user.name}</span>
-              <span className="text-[9px] text-slate-500 block truncate mt-1">{user.email}</span>
+            <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-medium">
+              <span className="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 font-bold border border-indigo-500/15">
+                {planNamePt}
+              </span>
+              <span className="text-slate-500">|</span>
+              <span className="text-slate-300 font-mono">
+                {leadsRemaining}
+              </span>
             </div>
           </div>
 
