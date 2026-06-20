@@ -86,7 +86,7 @@ export default function Register({ onLoginSuccess, onNavigateToLogin }) {
   };
 
   return (
-    <div className="w-full max-w-md p-8 rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 shadow-2xl animate-fade-in">
+    <div className="w-full max-w-md p-8 rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 shadow-2xl animate-fade-in login-card-glow">
       {success ? (
         <div className="flex flex-col items-center justify-center py-8 text-center animate-scale-up">
           <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20 mb-4 animate-bounce">

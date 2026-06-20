@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, LogIn, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export default function Login({ onLoginSuccess, onNavigateToRegister }) {
@@ -86,11 +86,13 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }) {
   };
 
   return (
-    <div className="w-full max-w-md p-8 rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 shadow-2xl animate-fade-in">
+    <div className="w-full max-w-md p-8 rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 shadow-2xl animate-fade-in login-card-glow">
       <div className="flex flex-col items-center mb-8">
-        <div className="p-3 bg-blue-500/10 text-blue-400 rounded-xl border border-blue-500/20 mb-4 animate-pulse-soft">
-          <LogIn className="w-8 h-8" />
-        </div>
+        <img 
+          src="/favicon.svg" 
+          alt="Gera Leads" 
+          className="w-16 h-16 rounded-xl shadow-lg shadow-indigo-500/10 border border-slate-800 mb-4" 
+        />
         <h2 className="text-3xl font-bold font-display text-white text-center">
           Bem-vindo de volta
         </h2>

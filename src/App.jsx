@@ -3,6 +3,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import ResetPassword from './components/ResetPassword';
 import Dashboard from './components/Dashboard';
+import AnimatedBackground from './components/AnimatedBackground';
 import { supabase } from './lib/supabase';
 
 export default function App() {
@@ -96,7 +97,7 @@ export default function App() {
   // Route: Reset Password page
   if (path === '/redefinir-senha') {
     return (
-      <div className="w-screen min-h-screen flex items-center justify-center p-4">
+      <AnimatedBackground>
         <ResetPassword 
           onSuccess={async () => {
             // Sign out of the temporary recovery session so user isn't logged in with it
@@ -112,7 +113,7 @@ export default function App() {
             setView('login');
           }}
         />
-      </div>
+      </AnimatedBackground>
     );
   }
 
@@ -128,7 +129,7 @@ export default function App() {
 
   // Otherwise, render authentication pages (Login or Register)
   return (
-    <div className="w-screen min-h-screen flex items-center justify-center p-4">
+    <AnimatedBackground>
       {view === 'login' ? (
         <Login 
           onLoginSuccess={handleLoginSuccess}
@@ -140,6 +141,6 @@ export default function App() {
           onNavigateToLogin={() => setView('login')}
         />
       )}
-    </div>
+    </AnimatedBackground>
   );
 }
