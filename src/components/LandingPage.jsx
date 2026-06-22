@@ -83,7 +83,18 @@ export default function LandingPage({ onNavigateApp }) {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 px-6">
+      <section className="relative overflow-hidden pt-20 pb-24 md:pt-28 md:pb-32 px-6">
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: -1,
+            backgroundImage: 'linear-gradient(to right, #1e1b4b22 1px, transparent 1px), linear-gradient(to bottom, #1e1b4b22 1px, transparent 1px)',
+            backgroundSize: '32px 32px',
+            maskImage: 'radial-gradient(ellipse at center, transparent 20%, black 80%)',
+            WebkitMaskImage: 'radial-gradient(ellipse at center, transparent 20%, black 80%)',
+          }}
+        />
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full text-xs font-semibold animate-pulse-soft">
             <Sparkles className="w-3.5 h-3.5" />
