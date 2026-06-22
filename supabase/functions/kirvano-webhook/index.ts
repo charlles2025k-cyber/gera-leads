@@ -86,6 +86,26 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: error.message }), { headers: corsHeaders, status: 500 })
       }
 
+      let disparos_limite = 500
+      if (plan === 'quarterly') {
+        disparos_limite = 1500
+      } else if (plan === 'annual') {
+        disparos_limite = 5000
+      }
+
+      const { error: licenseError } = await supabase
+        .from('zapflow_licenses')
+        .upsert({
+          user_id: user.id,
+          plan_type: plan,
+          expires_at: expires.toISOString(),
+          disparos_limite: disparos_limite
+        }, { onConflict: 'user_id' })
+
+      if (licenseError) {
+        return new Response(JSON.stringify({ error: licenseError.message }), { headers: corsHeaders, status: 500 })
+      }
+
       return new Response(
         JSON.stringify({ success: true, action: isNew ? 'created_and_activated' : 'activated', plan, expires }),
         { headers: corsHeaders, status: 200 }

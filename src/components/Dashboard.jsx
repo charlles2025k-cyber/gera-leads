@@ -60,6 +60,11 @@ export default function Dashboard({ user, onLogout }) {
     period_start: null
   });
 
+  // ZapFlow License States
+  const [zapflowLicense, setZapflowLicense] = useState(null);
+  const [loadingLicense, setLoadingLicense] = useState(true);
+  const [copiedKey, setCopiedKey] = useState(false);
+
   // Modal Lock State
   const [lockModal, setLockModal] = useState({
     isOpen: false,
@@ -81,6 +86,7 @@ export default function Dashboard({ user, onLogout }) {
         fetchUserProfile();
         fetchUsageTracking();
         fetchSearchHistory();
+        fetchZapflowLicense();
       }
     };
 
@@ -92,6 +98,7 @@ export default function Dashboard({ user, onLogout }) {
         fetchUserProfile();
         fetchUsageTracking();
         fetchSearchHistory();
+        fetchZapflowLicense();
       }
     });
 
@@ -161,6 +168,36 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
+  // Fetch ZapFlow license details from Supabase
+  const fetchZapflowLicense = async () => {
+    setLoadingLicense(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data, error } = await supabase
+          .from('zapflow_licenses')
+          .select('license_key, disparos_usados, disparos_limite, plan_type')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        setZapflowLicense(data || null);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar licença ZapFlow:", err);
+      setZapflowLicense(null);
+    } finally {
+      setLoadingLicense(false);
+    }
+  };
+
+  const handleCopyLicenseKey = (key) => {
+    if (!key) return;
+    navigator.clipboard.writeText(key);
+    setCopiedKey(true);
+    setTimeout(() => setCopiedKey(false), 2000);
+  };
+
   // Calculate days remaining and expired status
   const daysRemaining = useMemo(() => {
     if (!profile || profile.plan === 'free' || !profile.plan_expires_at) return null;
@@ -220,6 +257,20 @@ export default function Dashboard({ user, onLogout }) {
     if (used >= planLimit * 0.8) return { progressBarColor: 'bg-amber-500', progressTextColor: 'text-amber-400' };
     return { progressBarColor: 'bg-indigo-500', progressTextColor: 'text-indigo-400' };
   }, [usageTracking, planLimit]);
+
+  const zapflowPercent = useMemo(() => {
+    if (!zapflowLicense || !zapflowLicense.disparos_limite) return 0;
+    return ((zapflowLicense.disparos_usados || 0) / zapflowLicense.disparos_limite) * 100;
+  }, [zapflowLicense]);
+
+  const zapflowProgressBarColor = useMemo(() => {
+    if (!zapflowLicense) return 'bg-indigo-500';
+    const used = zapflowLicense.disparos_usados || 0;
+    const limit = zapflowLicense.disparos_limite;
+    if (used >= limit) return 'bg-red-500';
+    if (used >= limit * 0.8) return 'bg-amber-500';
+    return 'bg-indigo-500';
+  }, [zapflowLicense]);
 
   // Fetch search history from Supabase
   const fetchSearchHistory = async () => {
@@ -877,7 +928,10 @@ export default function Dashboard({ user, onLogout }) {
                 <p className="text-slate-400 text-xs mt-1">Visão integrada das buscas e leads coletados</p>
               </div>
               <button
-                onClick={fetchSearchHistory}
+                onClick={() => {
+                  fetchSearchHistory();
+                  fetchZapflowLicense();
+                }}
                 className="p-2 border border-slate-800 hover:border-slate-700 hover:bg-slate-850/30 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
                 disabled={loadingHistory}
               >
@@ -887,7 +941,7 @@ export default function Dashboard({ user, onLogout }) {
             </div>
 
             {/* Metrics cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="p-6 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl flex items-center gap-4">
                 <div className="p-3 bg-blue-500/10 text-blue-400 rounded-xl">
                   <Database className="w-6 h-6" />
@@ -915,6 +969,49 @@ export default function Dashboard({ user, onLogout }) {
                 <div>
                   <span className="text-slate-405 text-xs block font-medium">Leads esta Semana</span>
                   <span className="text-2xl font-bold text-white block mt-0.5">{metrics.leadsThisWeek}</span>
+                </div>
+              </div>
+
+              <div className="p-6 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl flex items-start gap-4">
+                <div className="p-3 bg-indigo-500/10 text-indigo-400 rounded-xl shrink-0">
+                  <Send className="w-6 h-6" />
+                </div>
+                <div className="flex-grow min-w-0">
+                  <span className="text-slate-405 text-xs block font-medium">ZapFlow</span>
+                  {loadingLicense ? (
+                    <span className="text-slate-500 text-xs block mt-1.5 animate-pulse">Carregando...</span>
+                  ) : !zapflowLicense ? (
+                    <span className="text-amber-400 text-xs font-semibold block mt-1.5">Nenhum plano ativo</span>
+                  ) : (
+                    <div className="mt-1.5 space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-mono text-slate-200 truncate" title={zapflowLicense.license_key}>
+                          {zapflowLicense.license_key}
+                        </span>
+                        <button
+                          onClick={() => handleCopyLicenseKey(zapflowLicense.license_key)}
+                          className="px-2 py-0.5 bg-slate-850 hover:bg-slate-800 text-slate-300 hover:text-white rounded border border-slate-750 text-[10px] font-semibold transition-all cursor-pointer whitespace-nowrap"
+                        >
+                          {copiedKey ? 'Copiado!' : 'Copiar'}
+                        </button>
+                      </div>
+                      
+                      <div className="space-y-1.5 pt-2 border-t border-slate-800/60">
+                        <div className="flex justify-between items-center text-[10px]">
+                          <span className="text-slate-450 font-medium">Disparos</span>
+                          <span className="font-mono text-slate-355 font-bold">
+                            {zapflowLicense.disparos_usados || 0} / {zapflowLicense.disparos_limite}
+                          </span>
+                        </div>
+                        <div className="w-full bg-slate-950/50 rounded-full h-2.5 border border-slate-850 overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-500 ${zapflowProgressBarColor}`}
+                            style={{ width: `${Math.min(100, zapflowPercent)}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
