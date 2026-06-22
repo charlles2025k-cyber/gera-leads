@@ -231,7 +231,7 @@ export default function Dashboard({ user, onLogout }) {
     const plan = (profile?.plan || 'free').trim();
     if (plan === 'monthly') return 500;
     if (plan === 'quarterly') return 1500;
-    if (plan === 'annual') return Infinity;
+    if (plan === 'annual') return 5000;
     return 0;
   }, [profile]);
 
@@ -247,13 +247,11 @@ export default function Dashboard({ user, onLogout }) {
   const userPlan = useMemo(() => (profile?.plan || 'free').trim(), [profile]);
 
   const leadsRemaining = useMemo(() => {
-    const plan = (profile?.plan || 'free').trim();
-    if (plan === 'annual') return 'Ilimitado';
     const limit = planLimit;
     const used = usageTracking.leads_used || 0;
     const remaining = Math.max(0, limit - used);
     return `${remaining}/${limit} leads restantes`;
-  }, [profile, planLimit, usageTracking]);
+  }, [planLimit, usageTracking]);
 
   // Compute progress percent for limit bar
   const progressPercent = useMemo(() => {
@@ -454,7 +452,7 @@ export default function Dashboard({ user, onLogout }) {
       let planLimit = 0;
       if (plan === 'monthly') planLimit = 500;
       else if (plan === 'quarterly') planLimit = 1500;
-      else if (plan === 'annual') planLimit = Infinity;
+      else if (plan === 'annual') planLimit = 5000;
 
       // 2. Get the user's current usage tracking status
       let { data: usage, error: usageErr } = await supabase
@@ -1218,10 +1216,10 @@ export default function Dashboard({ user, onLogout }) {
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-350 font-semibold">Consumo do Plano</span>
                     <span className={`font-mono text-xs font-bold ${progressTextColor}`}>
-                      {profile.plan === 'annual' ? 'Ilimitado' : `${usageTracking.leads_used || 0} / ${planLimit} leads`}
+                      {`${usageTracking.leads_used || 0} / ${planLimit} leads`}
                     </span>
                   </div>
-                  {profile.plan !== 'annual' && (
+                  {planLimit > 0 && (
                     <div className="w-full bg-slate-950/50 rounded-full h-2.5 border border-slate-850 overflow-hidden">
                       <div 
                         className={`h-full rounded-full transition-all duration-500 ${progressBarColor}`}
@@ -1231,7 +1229,7 @@ export default function Dashboard({ user, onLogout }) {
                   )}
                   <p className="text-[10px] text-slate-500 leading-relaxed">
                     {profile.plan === 'annual' 
-                      ? 'Seu plano anual inclui buscas ilimitadas de leads.'
+                      ? 'Seu plano anual inclui buscas de até 5000 leads por mês.'
                       : `Limite mensal do seu plano ${planNamePt}.`}
                   </p>
                 </div>
