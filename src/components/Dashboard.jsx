@@ -1600,10 +1600,10 @@ export default function Dashboard({ user, onLogout }) {
                   subPrice: 'equivalente a R$0,54/dia',
                   description: 'Para agências e equipes que buscam resultados de longo prazo.',
                   features: [
-                    { text: 'Leads ilimitados', included: true },
+                    { text: '5.000 leads/mês', included: true },
                     { text: 'Acesso completo ao Google Places Crawler', included: true },
                     { text: 'Filtro automático de leads sem website', included: true },
-                    { text: 'Exportação ilimitada para CSV', included: true },
+                    { text: 'Exportação para CSV', included: true },
                     { text: 'Disparador inteligente', included: true },
                     { text: 'Suporte prioritário', included: true },
                     { text: 'Curso completo de renda extra', included: true },
