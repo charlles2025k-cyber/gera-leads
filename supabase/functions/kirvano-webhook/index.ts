@@ -93,13 +93,16 @@ Deno.serve(async (req) => {
         disparos_limite = 5000
       }
 
+      const userName = name || email.split('@')[0]
+
       const { error: licenseError } = await supabase
         .from('zapflow_licenses')
         .upsert({
           user_id: user.id,
           plan_type: plan,
           expires_at: expires.toISOString(),
-          disparos_limite: disparos_limite
+          disparos_limite: disparos_limite,
+          user_name: userName
         }, { onConflict: 'user_id' })
 
       if (licenseError) {
