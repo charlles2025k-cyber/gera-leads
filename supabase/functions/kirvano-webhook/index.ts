@@ -123,6 +123,12 @@ Deno.serve(async (req) => {
     }
 
     if (event === 'subscription_canceled') {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('plan_expires_at')
+        .eq('id', user.id)
+        .maybeSingle()
+
       const { error } = await supabase
         .from('profiles')
         .update({ status: 'canceled' })
@@ -132,17 +138,38 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: error.message }), { headers: corsHeaders, status: 500 })
       }
 
+      if (profile?.plan_expires_at) {
+        const { error: licenseError } = await supabase
+          .from('zapflow_licenses')
+          .update({ expires_at: profile.plan_expires_at })
+          .eq('user_id', user.id)
+
+        if (licenseError) {
+          return new Response(JSON.stringify({ error: licenseError.message }), { headers: corsHeaders, status: 500 })
+        }
+      }
+
       return new Response(JSON.stringify({ success: true, action: 'marked_canceled' }), { headers: corsHeaders, status: 200 })
     }
 
     if (event === 'refund' || event === 'chargeback') {
+      const now = new Date().toISOString()
       const { error } = await supabase
         .from('profiles')
-        .update({ plan: 'none', plan_expires_at: new Date().toISOString(), status: 'revoked' })
+        .update({ plan: 'none', plan_expires_at: now, status: 'revoked' })
         .eq('id', user.id)
 
       if (error) {
         return new Response(JSON.stringify({ error: error.message }), { headers: corsHeaders, status: 500 })
+      }
+
+      const { error: licenseError } = await supabase
+        .from('zapflow_licenses')
+        .update({ expires_at: now })
+        .eq('user_id', user.id)
+
+      if (licenseError) {
+        return new Response(JSON.stringify({ error: licenseError.message }), { headers: corsHeaders, status: 500 })
       }
 
       return new Response(JSON.stringify({ success: true, action: 'revoked' }), { headers: corsHeaders, status: 200 })
