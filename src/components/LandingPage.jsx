@@ -289,7 +289,7 @@ export default function LandingPage({ onNavigateApp }) {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-24 border-t border-slate-900 px-6">
+      <section id="pricing" className="py-24 border-t border-slate-900 px-6" style={{ background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120,119,198,0.2), transparent)' }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto space-y-4 mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold font-display text-white">
@@ -302,7 +302,7 @@ export default function LandingPage({ onNavigateApp }) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch max-w-5xl mx-auto">
             {/* Mensal */}
-            <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 flex flex-col justify-between hover:border-slate-700/80 transition-all shadow-xl">
+            <div className="p-8 rounded-2xl bg-[#0a0f1d]/50 backdrop-blur-xl flex flex-col justify-between hover:border-slate-700/80 transition-all shadow-xl" style={{ border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 -20px 80px -20px #8686f01f inset' }}>
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-bold text-white font-display">Mensal</h3>
@@ -348,7 +348,7 @@ export default function LandingPage({ onNavigateApp }) {
             </div>
 
             {/* Trimestral */}
-            <div className="p-8 rounded-2xl bg-indigo-650/10 border-2 border-indigo-500 flex flex-col justify-between transition-all shadow-2xl relative overflow-hidden">
+            <div className="p-8 rounded-2xl bg-[#0a0f1d]/50 backdrop-blur-xl flex flex-col justify-between hover:border-slate-700/80 transition-all shadow-2xl relative overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 -20px 80px -20px #8686f01f inset' }}>
               {/* Popular Tag */}
               <div className="absolute top-0 right-0 bg-indigo-500 text-white px-4 py-1 rounded-bl-xl text-[10px] font-black uppercase tracking-wider">
                 Melhor Custo-Benefício
@@ -414,7 +414,7 @@ export default function LandingPage({ onNavigateApp }) {
             </div>
 
             {/* Anual */}
-            <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 flex flex-col justify-between hover:border-slate-700/80 transition-all shadow-xl">
+            <div className="p-8 rounded-2xl bg-[#0a0f1d]/50 backdrop-blur-xl flex flex-col justify-between hover:border-slate-700/80 transition-all shadow-xl" style={{ border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 -20px 80px -20px #8686f01f inset' }}>
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-bold text-white font-display">Anual</h3>
