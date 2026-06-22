@@ -771,7 +771,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
             </button>
             <button
               onClick={() => {
-                if (userPlan === 'quarterly' || userPlan === 'annual') {
+                if (userPlan === 'monthly' || userPlan === 'quarterly' || userPlan === 'annual') {
                   setActiveTab('course');
                 } else {
                   setLockModal({
@@ -791,7 +791,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                 <BookOpen className="w-4 h-4" />
                 Curso
               </div>
-              {userPlan !== 'quarterly' && userPlan !== 'annual' && (
+              {userPlan !== 'monthly' && userPlan !== 'quarterly' && userPlan !== 'annual' && (
                 <Lock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
               )}
             </button>
@@ -878,7 +878,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
         </button>
         <button
           onClick={() => {
-            if (userPlan === 'quarterly' || userPlan === 'annual') {
+            if (userPlan === 'monthly' || userPlan === 'quarterly' || userPlan === 'annual') {
               setActiveTab('course');
             } else {
               setLockModal({
@@ -894,7 +894,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
         >
           <div className="relative">
             <BookOpen className="w-4 h-4" />
-            {userPlan !== 'quarterly' && userPlan !== 'annual' && (
+            {userPlan !== 'monthly' && userPlan !== 'quarterly' && userPlan !== 'annual' && (
               <Lock className="w-2.5 h-2.5 text-slate-500 absolute -top-1.5 -right-1.5 bg-[#0a0f1b] rounded-full p-0.5" />
             )}
           </div>
@@ -1131,7 +1131,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
         )}
 
         {/* Tab: Curso */}
-        {activeTab === 'course' && (userPlan === 'quarterly' || userPlan === 'annual') && (
+        {activeTab === 'course' && (userPlan === 'monthly' || userPlan === 'quarterly' || userPlan === 'annual') && (
           <div className="space-y-8 animate-fade-in max-w-4xl mx-auto">
             <div className="border-b border-slate-900 pb-5">
               <h2 className="text-2xl font-bold font-display text-white">Curso Renda Extra</h2>
