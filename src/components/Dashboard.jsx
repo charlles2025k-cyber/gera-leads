@@ -12,7 +12,7 @@ import {
   CartesianGrid, Tooltip, PieChart, Pie, Cell 
 } from 'recharts';
 
-export default function Dashboard({ user, onLogout }) {
+export default function Dashboard({ user, onLogout, showAlert }) {
   // Navigation State
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'search' | 'plans' | 'settings'
 
@@ -196,6 +196,7 @@ export default function Dashboard({ user, onLogout }) {
     console.log("Copiando chave da licença ZapFlow:", key);
     navigator.clipboard.writeText(key).then(() => {
       setCopiedKey(true);
+      if (showAlert) showAlert("Chave da licença copiada para a área de transferência!", "success");
       setTimeout(() => setCopiedKey(false), 2000);
     }).catch(() => {
       // fallback for older browsers
@@ -206,6 +207,7 @@ export default function Dashboard({ user, onLogout }) {
       document.execCommand('copy');
       document.body.removeChild(el);
       setCopiedKey(true);
+      if (showAlert) showAlert("Chave da licença copiada para a área de transferência!", "success");
       setTimeout(() => setCopiedKey(false), 2000);
     });
   };
@@ -322,6 +324,7 @@ export default function Dashboard({ user, onLogout }) {
     e.preventDefault();
     localStorage.setItem('apify_api_key', apiKey);
     setApiKeySaved(true);
+    if (showAlert) showAlert("Chave API do Apify salva com sucesso!", "success");
     // Visual indicator
     const btn = document.getElementById('save-key-btn');
     if (btn) {
@@ -342,7 +345,9 @@ export default function Dashboard({ user, onLogout }) {
 
   const handleBulkDispatch = async () => {
     if (!apiKey) {
-      setError('Por favor, configure e salve sua API Key do Apify para enviar mensagens.');
+      const errorMsg = 'Por favor, configure e salve sua API Key do Apify para enviar mensagens.';
+      setError(errorMsg);
+      if (showAlert) showAlert(errorMsg, 'warning');
       return;
     }
 
@@ -412,17 +417,23 @@ export default function Dashboard({ user, onLogout }) {
     setDispatchStatus({});
 
     if (!apiKey) {
-      setError('Por favor, configure e salve sua API Key do Apify para realizar buscas reais.');
+      const errorMsg = 'Por favor, configure e salve sua API Key do Apify para realizar buscas reais.';
+      setError(errorMsg);
+      if (showAlert) showAlert(errorMsg, 'warning');
       return;
     }
 
     if (!searchQuery.trim()) {
-      setError('Por favor, informe o termo de pesquisa (o que buscar).');
+      const errorMsg = 'Por favor, informe o termo de pesquisa (o que buscar).';
+      setError(errorMsg);
+      if (showAlert) showAlert(errorMsg, 'warning');
       return;
     }
 
     if (!locationQuery.trim()) {
-      setError('Por favor, informe a cidade/estado para a busca.');
+      const errorMsg = 'Por favor, informe a cidade/estado para a busca.';
+      setError(errorMsg);
+      if (showAlert) showAlert(errorMsg, 'warning');
       return;
     }
 
@@ -627,6 +638,7 @@ export default function Dashboard({ user, onLogout }) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    if (showAlert) showAlert("Lista de leads exportada para CSV com sucesso!", "success");
   };
 
   // Filter local results in UI

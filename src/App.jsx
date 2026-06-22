@@ -5,6 +5,7 @@ import ResetPassword from './components/ResetPassword';
 import Dashboard from './components/Dashboard';
 import AnimatedBackground from './components/AnimatedBackground';
 import LandingPage from './components/LandingPage';
+import Alert from './components/Alert';
 import { supabase } from './lib/supabase';
 
 export default function App() {
@@ -12,6 +13,15 @@ export default function App() {
   const [view, setView] = useState('login'); // 'login' | 'register'
   const [initLoading, setInitLoading] = useState(true);
   const [path, setPath] = useState(window.location.pathname);
+  const [alertState, setAlertState] = useState({
+    isOpen: false,
+    message: '',
+    type: 'info'
+  });
+
+  const showAlert = (message, type = 'info') => {
+    setAlertState({ isOpen: true, message, type });
+  };
 
   // Sync route path state on browser back/forward navigation
   useEffect(() => {
@@ -86,6 +96,87 @@ export default function App() {
     setPath('/app');
   };
 
+  const renderContent = () => {
+    // Route: Reset Password page (supporting both old /redefinir-senha and new /app/redefinir-senha paths)
+    if (path === '/redefinir-senha' || path === '/app/redefinir-senha') {
+      return (
+        <AnimatedBackground>
+          <ResetPassword 
+            showAlert={showAlert}
+            onSuccess={async () => {
+              // Sign out of the temporary recovery session so user isn't logged in with it
+              await supabase.auth.signOut();
+              setUser(null);
+              setView('login');
+              window.history.pushState({}, '', '/app');
+              setPath('/app');
+            }}
+            onCancel={() => {
+              setView('login');
+              window.history.pushState({}, '', '/app');
+              setPath('/app');
+            }}
+          />
+        </AnimatedBackground>
+      );
+    }
+
+    // Route: Landing page at root "/"
+    if (path === '/') {
+      return (
+        <LandingPage 
+          showAlert={showAlert}
+          onNavigateApp={() => {
+            window.history.pushState({}, '', '/app');
+            setPath('/app');
+          }}
+        />
+      );
+    }
+
+    // Route: App paths under "/app"
+    if (path.startsWith('/app')) {
+      if (user) {
+        return (
+          <Dashboard 
+            user={user} 
+            onLogout={handleLogout} 
+            showAlert={showAlert}
+          />
+        );
+      }
+
+      return (
+        <AnimatedBackground>
+          {view === 'login' ? (
+            <Login 
+              onLoginSuccess={handleLoginSuccess}
+              onNavigateToRegister={() => setView('register')}
+              showAlert={showAlert}
+            />
+          ) : (
+            <Register 
+              onLoginSuccess={handleLoginSuccess}
+              onNavigateToLogin={() => setView('login')}
+              showAlert={showAlert}
+            />
+          )}
+        </AnimatedBackground>
+      );
+    }
+
+    // Fallback: default to landing page
+    return (
+      <LandingPage 
+        showAlert={showAlert}
+        onNavigateApp={() => {
+          window.history.pushState({}, '', '/app');
+          setPath('/app');
+        }}
+      />
+    );
+  };
+
   if (initLoading) {
     return (
       <div className="w-screen h-screen flex justify-center items-center bg-[#090d16]">
@@ -97,76 +188,16 @@ export default function App() {
     );
   }
 
-  // Route: Reset Password page (supporting both old /redefinir-senha and new /app/redefinir-senha paths)
-  if (path === '/redefinir-senha' || path === '/app/redefinir-senha') {
-    return (
-      <AnimatedBackground>
-        <ResetPassword 
-          onSuccess={async () => {
-            // Sign out of the temporary recovery session so user isn't logged in with it
-            await supabase.auth.signOut();
-            setUser(null);
-            setView('login');
-            window.history.pushState({}, '', '/app');
-            setPath('/app');
-          }}
-          onCancel={() => {
-            setView('login');
-            window.history.pushState({}, '', '/app');
-            setPath('/app');
-          }}
-        />
-      </AnimatedBackground>
-    );
-  }
-
-  // Route: Landing page at root "/"
-  if (path === '/') {
-    return (
-      <LandingPage 
-        onNavigateApp={() => {
-          window.history.pushState({}, '', '/app');
-          setPath('/app');
-        }}
-      />
-    );
-  }
-
-  // Route: App paths under "/app"
-  if (path.startsWith('/app')) {
-    if (user) {
-      return (
-        <Dashboard 
-          user={user} 
-          onLogout={handleLogout} 
-        />
-      );
-    }
-
-    return (
-      <AnimatedBackground>
-        {view === 'login' ? (
-          <Login 
-            onLoginSuccess={handleLoginSuccess}
-            onNavigateToRegister={() => setView('register')}
-          />
-        ) : (
-          <Register 
-            onLoginSuccess={handleLoginSuccess}
-            onNavigateToLogin={() => setView('login')}
-          />
-        )}
-      </AnimatedBackground>
-    );
-  }
-
-  // Fallback: default to landing page
   return (
-    <LandingPage 
-      onNavigateApp={() => {
-        window.history.pushState({}, '', '/app');
-        setPath('/app');
-      }}
-    />
+    <>
+      {renderContent()}
+      {alertState.isOpen && (
+        <Alert 
+          message={alertState.message} 
+          type={alertState.type} 
+          onClose={() => setAlertState(prev => ({ ...prev, isOpen: false }))} 
+        />
+      )}
+    </>
   );
 }
