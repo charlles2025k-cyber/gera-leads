@@ -8,6 +8,16 @@ import {
 export default function LandingPage({ onNavigateApp }) {
   const [activeFeature, setActiveFeature] = useState(0);
   const [openFaq, setOpenFaq] = useState(null);
+  const [fade, setFade] = useState(false);
+
+  const handleFeatureClick = (idx) => {
+    if (idx === activeFeature) return;
+    setFade(true);
+    setTimeout(() => {
+      setActiveFeature(idx);
+      setFade(false);
+    }, 200);
+  };
 
   const faqData = [
     {
@@ -42,35 +52,40 @@ export default function LandingPage({ onNavigateApp }) {
       title: "Busca no Google Maps",
       desc: "Procure qualquer tipo de negócio em qualquer cidade do Brasil. Nossa tecnologia extrai dados fresquinhos do Google Places em tempo real.",
       color: "from-blue-500 to-indigo-600",
-      glowColor: "rgba(59, 130, 246, 0.15)"
+      glowColor: "rgba(59, 130, 246, 0.15)",
+      img: "/screenshots/busca.png"
     },
     {
       icon: Download,
       title: "Exportação CSV",
       desc: "Baixe todas as informações comerciais (Nome, Telefone, Endereço, Categoria) em um arquivo CSV organizado com apenas um clique.",
       color: "from-emerald-500 to-teal-600",
-      glowColor: "rgba(16, 185, 129, 0.15)"
+      glowColor: "rgba(16, 185, 129, 0.15)",
+      img: "/screenshots/busca.png"
     },
     {
       icon: MessageSquare,
       title: "Disparo WhatsApp",
       desc: "Aborde dezenas de leads simultaneamente pelo WhatsApp com mensagens dinâmicas e personalizadas contendo o nome e endereço do local.",
       color: "from-green-500 to-emerald-600",
-      glowColor: "rgba(34, 197, 94, 0.15)"
+      glowColor: "rgba(34, 197, 94, 0.15)",
+      img: "/screenshots/disparo.png"
     },
     {
       icon: RefreshCw,
       title: "Funil de Resposta",
       desc: "Automações inteligentes para continuar o atendimento de leads que responderam positivamente à sua prospecção inicial.",
       color: "from-amber-500 to-orange-600",
-      glowColor: "rgba(245, 158, 11, 0.15)"
+      glowColor: "rgba(245, 158, 11, 0.15)",
+      img: "/screenshots/funil.png"
     },
     {
       icon: Key,
       title: "Integração ZapFlow",
       desc: "Vincule sua chave ZapFlow diretamente na plataforma para usufruir de envios integrados em massa e automações avançadas.",
       color: "from-indigo-500 to-purple-600",
-      glowColor: "rgba(99, 102, 241, 0.15)"
+      glowColor: "rgba(99, 102, 241, 0.15)",
+      img: "/screenshots/zapflow.png"
     }
   ];
 
@@ -259,7 +274,7 @@ export default function LandingPage({ onNavigateApp }) {
                 return (
                   <button
                     key={idx}
-                    onClick={() => setActiveFeature(idx)}
+                    onClick={() => handleFeatureClick(idx)}
                     className={`w-full text-left p-5 rounded-2xl transition-all border flex items-start gap-4 cursor-pointer ${
                       isActive 
                         ? 'bg-slate-900/60 border-slate-800 shadow-xl' 
@@ -283,32 +298,29 @@ export default function LandingPage({ onNavigateApp }) {
             </div>
 
             {/* Right Side: Showcase Box */}
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-7 flex justify-center items-center">
               <div 
-                className="relative rounded-2xl border border-slate-800/80 p-8 shadow-2xl backdrop-blur-xl h-[380px] flex flex-col justify-between transition-all duration-500 overflow-hidden"
+                className={`relative rounded-2xl border border-slate-800/80 bg-slate-950/40 p-2 shadow-2xl backdrop-blur-xl h-[400px] w-full flex items-center justify-center overflow-hidden transition-all duration-300 ${
+                  fade ? 'opacity-40 scale-[0.98]' : 'opacity-100 scale-100'
+                }`}
                 style={{ 
-                  backgroundColor: 'rgba(9, 13, 22, 0.4)',
                   boxShadow: `0 20px 25px -5px ${features[activeFeature].glowColor}`
                 }}
               >
-                {/* Decorative glowing background item */}
-                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-tr ${features[activeFeature].color} opacity-10 rounded-full blur-2xl`} />
+                <div className="relative max-h-full max-w-full flex items-center justify-center overflow-hidden rounded-xl border border-slate-800/50 bg-[#070b13]/10">
+                  <img 
+                    src={features[activeFeature].img} 
+                    alt={features[activeFeature].title}
+                    className="max-h-[384px] max-w-full object-contain rounded-xl"
+                  />
 
-                <div className="space-y-6 relative z-10">
-                  <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest block">Recurso em destaque</span>
-                  <div className="space-y-3">
-                    <h3 className="text-2xl font-bold font-display text-white">{features[activeFeature].title}</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed max-w-xl">
-                      {features[activeFeature].desc}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="border-t border-slate-900 pt-6 relative z-10">
-                  <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
-                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                    <span>Incluso em todas as licenças aplicáveis</span>
-                  </div>
+                  {/* Blur overlay for WhatsApp conversations (left ~34% of the image) */}
+                  {(features[activeFeature].img === '/screenshots/disparo.png' || features[activeFeature].img === '/screenshots/funil.png') && (
+                    <div 
+                      className="absolute inset-y-0 left-0 w-[34%] pointer-events-none backdrop-blur-[6px] bg-[#070b13]/10 border-r border-white/5 rounded-l-xl"
+                      style={{ zIndex: 10 }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
