@@ -580,6 +580,24 @@ export default function LandingPage({ onNavigateApp }) {
         </div>
       </footer>
 
+      {/* Floating WhatsApp Button */}
+      <div className="group fixed bottom-6 right-6 z-[9999] flex items-center">
+        <div className="absolute right-16 bg-slate-900/95 text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-800 shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap translate-x-2 group-hover:translate-x-0 backdrop-blur-sm">
+          Fale conosco no WhatsApp
+        </div>
+        <a
+          href="https://wa.me/5585988653086"
+          target="_blank"
+          rel="noreferrer"
+          className="relative w-14 h-14 bg-[#25D366] hover:bg-[#22c35e] text-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105 active:scale-95 cursor-pointer animate-whatsapp-pulse"
+          aria-label="Fale conosco no WhatsApp"
+        >
+          <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.717-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.86.002-2.636-1.022-5.11-2.884-6.973C16.53 1.889 14.05 .865 11.414.865c-5.433 0-9.85 4.417-9.855 9.856-.002 1.714.453 3.39 1.317 4.878L1.87 20.36l5.051-1.325c-.004-.001-.004-.001-.005-.001zm11.477-7.63c-.327-.164-1.93-.953-2.229-1.062-.299-.11-.517-.164-.736.164-.218.327-.844 1.062-1.035 1.281-.19.219-.382.246-.708.082-1.123-.563-1.931-.98-2.703-2.302-.204-.349.204-.324.582-1.08.06-.12.03-.225-.015-.317-.045-.09-.382-.92-.523-1.26-.138-.33-.278-.286-.382-.292l-.326-.005c-.11 0-.289.042-.44.205-.152.164-.582.569-.582 1.388 0 .819.596 1.611.679 1.72.083.11 1.173 1.79 2.84 2.508.397.171.706.273.948.35.4.127.763.109 1.05.066.32-.048.953-.39 1.087-.768.134-.378.134-.702.094-.768-.04-.067-.15-.107-.478-.27z"/>
+          </svg>
+        </a>
+      </div>
+
     </div>
   );
 }
