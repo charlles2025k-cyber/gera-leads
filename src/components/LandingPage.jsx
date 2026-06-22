@@ -314,13 +314,18 @@ export default function LandingPage({ onNavigateApp }) {
                     className="max-h-[384px] max-w-full object-contain rounded-xl"
                   />
 
-                  {/* Blur overlay for WhatsApp conversations (left ~34% of the image) */}
-                  {(features[activeFeature].img === '/screenshots/disparo.png' || features[activeFeature].img === '/screenshots/funil.png') && (
+                  {/* Blur overlay for WhatsApp conversations (left ~34% of the image for disparo/funil, and left ~72% for zapflow) */}
+                  {features[activeFeature].img === '/screenshots/zapflow.png' ? (
+                    <div 
+                      className="absolute inset-y-0 left-0 w-[72%] pointer-events-none backdrop-blur-[8px] bg-[#070b13]/35 border-r border-white/5 rounded-l-xl"
+                      style={{ zIndex: 10 }}
+                    />
+                  ) : (features[activeFeature].img === '/screenshots/disparo.png' || features[activeFeature].img === '/screenshots/funil.png') ? (
                     <div 
                       className="absolute inset-y-0 left-0 w-[34%] pointer-events-none backdrop-blur-[6px] bg-[#070b13]/10 border-r border-white/5 rounded-l-xl"
                       style={{ zIndex: 10 }}
                     />
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>
