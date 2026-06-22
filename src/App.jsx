@@ -4,6 +4,7 @@ import Register from './components/Register';
 import ResetPassword from './components/ResetPassword';
 import Dashboard from './components/Dashboard';
 import AnimatedBackground from './components/AnimatedBackground';
+import LandingPage from './components/LandingPage';
 import { supabase } from './lib/supabase';
 
 export default function App() {
@@ -81,6 +82,8 @@ export default function App() {
     }
     setUser(null);
     setView('login');
+    window.history.pushState({}, '', '/app');
+    setPath('/app');
   };
 
   if (initLoading) {
@@ -94,8 +97,8 @@ export default function App() {
     );
   }
 
-  // Route: Reset Password page
-  if (path === '/redefinir-senha') {
+  // Route: Reset Password page (supporting both old /redefinir-senha and new /app/redefinir-senha paths)
+  if (path === '/redefinir-senha' || path === '/app/redefinir-senha') {
     return (
       <AnimatedBackground>
         <ResetPassword 
@@ -104,43 +107,66 @@ export default function App() {
             await supabase.auth.signOut();
             setUser(null);
             setView('login');
-            window.history.pushState({}, '', '/');
-            setPath('/');
+            window.history.pushState({}, '', '/app');
+            setPath('/app');
           }}
           onCancel={() => {
-            window.history.pushState({}, '', '/');
-            setPath('/');
             setView('login');
+            window.history.pushState({}, '', '/app');
+            setPath('/app');
           }}
         />
       </AnimatedBackground>
     );
   }
 
-  // If user is authenticated, render the Dashboard
-  if (user) {
+  // Route: Landing page at root "/"
+  if (path === '/') {
     return (
-      <Dashboard 
-        user={user} 
-        onLogout={handleLogout} 
+      <LandingPage 
+        onNavigateApp={() => {
+          window.history.pushState({}, '', '/app');
+          setPath('/app');
+        }}
       />
     );
   }
 
-  // Otherwise, render authentication pages (Login or Register)
+  // Route: App paths under "/app"
+  if (path.startsWith('/app')) {
+    if (user) {
+      return (
+        <Dashboard 
+          user={user} 
+          onLogout={handleLogout} 
+        />
+      );
+    }
+
+    return (
+      <AnimatedBackground>
+        {view === 'login' ? (
+          <Login 
+            onLoginSuccess={handleLoginSuccess}
+            onNavigateToRegister={() => setView('register')}
+          />
+        ) : (
+          <Register 
+            onLoginSuccess={handleLoginSuccess}
+            onNavigateToLogin={() => setView('login')}
+          />
+        )}
+      </AnimatedBackground>
+    );
+  }
+
+  // Fallback: default to landing page
   return (
-    <AnimatedBackground>
-      {view === 'login' ? (
-        <Login 
-          onLoginSuccess={handleLoginSuccess}
-          onNavigateToRegister={() => setView('register')}
-        />
-      ) : (
-        <Register 
-          onLoginSuccess={handleLoginSuccess}
-          onNavigateToLogin={() => setView('login')}
-        />
-      )}
-    </AnimatedBackground>
+    <LandingPage 
+      onNavigateApp={() => {
+        window.history.pushState({}, '', '/app');
+        setPath('/app');
+      }}
+    />
   );
 }
