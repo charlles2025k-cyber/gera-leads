@@ -117,7 +117,7 @@ export default function Dashboard({ user, onLogout }) {
       if (session) {
         const { data, error } = await supabase
           .from('profiles')
-          .select('id, plan, plan_expires_at, plan_type')
+          .select('id, plan, plan_expires_at, plan_type, name')
           .eq('id', session.user.id)
           .maybeSingle();
 
@@ -271,6 +271,20 @@ export default function Dashboard({ user, onLogout }) {
     if (used >= limit * 0.8) return 'bg-amber-500';
     return 'bg-indigo-500';
   }, [zapflowLicense]);
+
+  const zapflowUserName = useMemo(() => {
+    if (profile && profile.name) return profile.name;
+    if (user && user.name) {
+      if (user.name.includes('@')) {
+        return user.name.split('@')[0];
+      }
+      return user.name;
+    }
+    if (user && user.email) {
+      return user.email.split('@')[0];
+    }
+    return 'Usuário';
+  }, [profile, user]);
 
   // Fetch search history from Supabase
   const fetchSearchHistory = async () => {
@@ -974,10 +988,10 @@ export default function Dashboard({ user, onLogout }) {
 
               <div className="p-6 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl flex items-start gap-4">
                 <div className="p-3 bg-indigo-500/10 text-indigo-400 rounded-xl shrink-0">
-                  <Send className="w-6 h-6" />
+                  <User className="w-6 h-6" />
                 </div>
                 <div className="flex-grow min-w-0">
-                  <span className="text-slate-405 text-xs block font-medium">ZapFlow</span>
+                  <span className="text-slate-405 text-xs block font-medium">{zapflowUserName}</span>
                   {loadingLicense ? (
                     <span className="text-slate-500 text-xs block mt-1.5 animate-pulse">Carregando...</span>
                   ) : !zapflowLicense ? (
