@@ -2,11 +2,39 @@ import React, { useState } from 'react';
 import { 
   Search, Download, MessageSquare, RefreshCw, Key, 
   MapPin, Database, Check, ArrowRight, ShieldCheck, 
-  Sparkles, Layers
+  Sparkles, Layers, ChevronDown
 } from 'lucide-react';
 
 export default function LandingPage({ onNavigateApp }) {
   const [activeFeature, setActiveFeature] = useState(0);
+  const [openFaq, setOpenFaq] = useState(null);
+
+  const faqData = [
+    {
+      q: "Como funciona o Gera Leads?",
+      a: "O Gera Leads busca dados diretamente do Google Maps em tempo real. Você digita o tipo de negócio e a cidade, e o sistema retorna uma lista completa de leads com nome, telefone, endereço e muito mais."
+    },
+    {
+      q: "Preciso instalar algum programa?",
+      a: "Não! O Gera Leads funciona 100% no navegador, sem instalação. O ZapFlow é uma extensão do Chrome gratuita para quem assinar o plano Trimestral ou Anual."
+    },
+    {
+      q: "Como funciona o disparo de WhatsApp?",
+      a: "Após buscar os leads, você pode disparar mensagens diretamente pelo WhatsApp Web usando a extensão ZapFlow. O sistema automatiza os envios respeitando os limites do seu plano."
+    },
+    {
+      q: "Posso cancelar quando quiser?",
+      a: "Sim! Você pode cancelar sua assinatura a qualquer momento. O acesso continua ativo até o fim do período já pago."
+    },
+    {
+      q: "Meus dados estão seguros?",
+      a: "Sim. Utilizamos criptografia de ponta e infraestrutura segura. Seus dados nunca são compartilhados com terceiros."
+    },
+    {
+      q: "Quanto posso buscar por mês?",
+      a: "Depende do seu plano: Mensal tem 500 leads/mês, Trimestral 1.500 leads/mês e Anual 5.000 leads/mês."
+    }
+  ];
 
   const features = [
     {
@@ -473,6 +501,45 @@ export default function LandingPage({ onNavigateApp }) {
                 </a>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="py-24 border-t border-slate-900 px-6 bg-slate-950/10">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto space-y-4 mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold font-display text-white">
+              Perguntas Frequentes (FAQ)
+            </h2>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Tire suas principais dúvidas sobre o funcionamento do Gera Leads e do ZapFlow.
+            </p>
+          </div>
+
+          <div className="max-w-3xl mx-auto space-y-4">
+            {faqData.map((faq, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <div 
+                  key={idx}
+                  className="rounded-xl bg-[#0a0f1d]/30 border border-slate-900 hover:border-slate-800/80 transition-all overflow-hidden"
+                >
+                  <button
+                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    className="w-full px-6 py-5 flex items-center justify-between text-left font-bold text-slate-200 hover:text-white text-sm sm:text-base gap-4 cursor-pointer"
+                  >
+                    <span>{faq.q}</span>
+                    <ChevronDown className={`w-5 h-5 text-slate-450 transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {isOpen && (
+                    <div className="px-6 pb-5 text-slate-400 text-xs sm:text-sm leading-relaxed border-t border-slate-900/60 pt-4">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
