@@ -1022,7 +1022,7 @@ export default function Dashboard({ user, onLogout }) {
                       
                       <div className="space-y-1.5 pt-2 border-t border-slate-800/60">
                         <div className="flex justify-between items-center text-[10px]">
-                          <span className="text-slate-450 font-medium">Disparos</span>
+                          <span className="text-slate-450 font-medium">Licença</span>
                           <span className="font-mono text-slate-355 font-bold">
                             {zapflowLicense.disparos_usados || 0} / {zapflowLicense.disparos_limite}
                           </span>
