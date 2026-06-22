@@ -193,9 +193,21 @@ export default function Dashboard({ user, onLogout }) {
 
   const handleCopyLicenseKey = (key) => {
     if (!key) return;
-    navigator.clipboard.writeText(key);
-    setCopiedKey(true);
-    setTimeout(() => setCopiedKey(false), 2000);
+    console.log("Copiando chave da licença ZapFlow:", key);
+    navigator.clipboard.writeText(key).then(() => {
+      setCopiedKey(true);
+      setTimeout(() => setCopiedKey(false), 2000);
+    }).catch(() => {
+      // fallback for older browsers
+      const el = document.createElement('textarea');
+      el.value = key;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      setCopiedKey(true);
+      setTimeout(() => setCopiedKey(false), 2000);
+    });
   };
 
   // Calculate days remaining and expired status
