@@ -2550,8 +2550,8 @@ export default function Dashboard({ user, onLogout, showAlert }) {
       )}
 
       {/* Floating WhatsApp Button */}
-      <div className="group fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 flex items-center">
-        <div className="absolute right-14 sm:right-16 bg-slate-900/95 text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-800 shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap translate-x-2 group-hover:translate-x-0 backdrop-blur-sm">
+      <div className="group fixed bottom-6 right-6 z-40 hidden md:flex items-center">
+        <div className="absolute right-16 bg-slate-900/95 text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-800 shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap translate-x-2 group-hover:translate-x-0 backdrop-blur-sm">
           Suporte via WhatsApp
         </div>
         <a
