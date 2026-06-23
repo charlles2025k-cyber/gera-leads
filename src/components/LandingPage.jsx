@@ -375,7 +375,7 @@ export default function LandingPage({ onNavigateApp }) {
 
               <div className="pt-8">
                 <a
-                  href="https://pay.cakto.com.br/mihqmub_93310747"
+                  href="https://pay.cakto.com.br/mihqmub_933107"
                   target="_blank"
                   rel="noreferrer"
                   className="w-full py-3.5 bg-slate-800 hover:bg-slate-750 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-md"
