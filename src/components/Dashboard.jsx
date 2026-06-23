@@ -890,6 +890,42 @@ export default function Dashboard({ user, onLogout, showAlert }) {
     if (showAlert) showAlert("Lista de leads exportada para CSV com sucesso!", "success");
   };
 
+  // Export WhatsApp Groups to CSV
+  const handleExportGroupCSV = () => {
+    if (groupResults.length === 0) return;
+
+    const headers = ['Link do Grupo', 'URL de Origem'];
+    const csvRows = [];
+    csvRows.push(headers.join(';'));
+
+    groupResults.forEach(item => {
+      const row = [
+        item.groupLink,
+        item.sourceUrl
+      ].map(val => {
+        const escaped = String(val).replace(/"/g, '""');
+        return `"${escaped}"`;
+      });
+      csvRows.push(row.join(';'));
+    });
+
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    const sanitizedNiche = groupNiche.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const filename = `grupos_${sanitizedNiche}.csv`;
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    if (showAlert) showAlert("Lista de grupos exportada para CSV com sucesso!", "success");
+  };
+
   // Filter local results in UI
   const filteredResults = results.filter(item => {
     const text = filterText.toLowerCase();
@@ -2086,6 +2122,14 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                           Mapeamos {groupResults.length} grupos únicos com base na sua pesquisa.
                         </p>
                       </div>
+
+                      <button
+                        onClick={handleExportGroupCSV}
+                        className="flex items-center gap-2 bg-gradient-to-tr from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md shadow-emerald-950/20 active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap"
+                      >
+                        <Download className="w-4 h-4" />
+                        Baixar CSV
+                      </button>
                     </div>
 
                     {/* Results table */}
