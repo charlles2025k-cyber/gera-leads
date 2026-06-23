@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Search, Download, MessageSquare, RefreshCw, Key, 
   MapPin, Database, Check, ArrowRight, ShieldCheck, 
-  Sparkles, Layers, ChevronDown, X
+  Sparkles, Layers, ChevronDown, X, Users
 } from 'lucide-react';
 
 export default function LandingPage({ onNavigateApp }) {
@@ -80,12 +80,12 @@ export default function LandingPage({ onNavigateApp }) {
       img: "/screenshots/funil.png"
     },
     {
-      icon: Key,
-      title: "Integração ZapFlow",
-      desc: "Vincule sua chave ZapFlow diretamente na plataforma para usufruir de envios integrados em massa e automações avançadas.",
+      icon: Users,
+      title: "Sistema de Grupos de WhatsApp",
+      desc: "Busque links de grupos de WhatsApp divulgados em redes sociais e na internet para realizar abordagens em massa ou networking segmentado.",
       color: "from-indigo-500 to-purple-600",
       glowColor: "rgba(99, 102, 241, 0.15)",
-      img: "/screenshots/zapflow.png"
+      img: "/screenshots/grupos.png"
     }
   ];
 
@@ -256,13 +256,8 @@ export default function LandingPage({ onNavigateApp }) {
                     className="max-h-[384px] max-w-full object-contain rounded-xl"
                   />
 
-                  {/* Blur overlay for WhatsApp conversations (left ~34% of the image for disparo/funil, and left ~40% for zapflow) */}
-                  {features[activeFeature].img === '/screenshots/zapflow.png' ? (
-                    <div 
-                      className="absolute inset-y-0 left-0 w-[40%] pointer-events-none backdrop-blur-[8px] bg-[#070b13]/35 border-r border-white/5 rounded-l-xl"
-                      style={{ zIndex: 10 }}
-                    />
-                  ) : (features[activeFeature].img === '/screenshots/disparo.png' || features[activeFeature].img === '/screenshots/funil.png') ? (
+                  {/* Blur overlay for WhatsApp conversations (left ~34% of the image for disparo/funil) */}
+                  {(features[activeFeature].img === '/screenshots/disparo.png' || features[activeFeature].img === '/screenshots/funil.png') ? (
                     <div 
                       className="absolute inset-y-0 left-0 w-[34%] pointer-events-none backdrop-blur-[6px] bg-[#070b13]/10 border-r border-white/5 rounded-l-xl"
                       style={{ zIndex: 10 }}
@@ -321,6 +316,10 @@ export default function LandingPage({ onNavigateApp }) {
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Disparador inteligente Zapflow extensão</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Buscador de Grupos de WhatsApp</span>
                   </li>
                   <li className="flex items-center gap-2 opacity-40">
                     <X className="w-4 h-4 text-red-500 shrink-0" />
@@ -393,6 +392,10 @@ export default function LandingPage({ onNavigateApp }) {
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Disparador inteligente Zapflow extensão</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Buscador de Grupos de WhatsApp</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />

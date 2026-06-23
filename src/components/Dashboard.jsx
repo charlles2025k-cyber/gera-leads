@@ -1969,12 +1969,31 @@ export default function Dashboard({ user, onLogout, showAlert }) {
 
       {/* Tab: Grupos WhatsApp */}
       {activeTab === 'whatsapp_groups' && (
-        <div className="space-y-8 animate-fade-in">
-          {/* Header */}
-          <div className="border-b border-slate-900 pb-5">
-            <h2 className="text-2xl font-bold font-display text-white">Grupos WhatsApp</h2>
-            <p className="text-slate-400 text-xs mt-1">Busque links de grupos do WhatsApp divulgados em redes sociais</p>
+        isExpired ? (
+          <div className="flex items-center justify-center min-h-[450px] p-4 animate-fade-in">
+            <div className="w-full max-w-md bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-8 shadow-2xl text-center space-y-6">
+              <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto animate-pulse-soft">
+                <AlertCircle className="w-8 h-8" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold font-display text-white mb-2">Acesso Bloqueado</h3>
+                <p className="text-slate-400 text-xs leading-relaxed">Seu plano venceu. Renove para continuar.</p>
+              </div>
+              <button
+                onClick={() => setActiveTab('plans')}
+                className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl transition-all shadow-lg hover:shadow-blue-500/20 active:scale-[0.98] cursor-pointer"
+              >
+                Ver Planos
+              </button>
+            </div>
           </div>
+        ) : (
+          <div className="space-y-8 animate-fade-in">
+            {/* Header */}
+            <div className="border-b border-slate-900 pb-5">
+              <h2 className="text-2xl font-bold font-display text-white">Grupos WhatsApp</h2>
+              <p className="text-slate-400 text-xs mt-1">Busque links de grupos do WhatsApp divulgados em redes sociais</p>
+            </div>
 
           {/* Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -2198,7 +2217,8 @@ export default function Dashboard({ user, onLogout, showAlert }) {
 
           </div>
         </div>
-      )}
+      )
+    )}
 
         {/* Tab 3: Planos */}
         {activeTab === 'plans' && (
@@ -2221,6 +2241,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                     { text: 'Filtro automático de leads sem website', included: true },
                     { text: 'Exportação ilimitada para CSV', included: true },
                     { text: 'Disparador inteligente Zapflow extensão', included: true },
+                    { text: 'Buscador de Grupos de WhatsApp', included: true },
                     { text: 'Suporte prioritário', included: false },
                     { text: 'Curso completo de renda extra', included: false },
                     { text: 'Grupo VIP de suporte', included: false },
@@ -2242,6 +2263,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                     { text: 'Filtro automático de leads sem website', included: true },
                     { text: 'Exportação ilimitada para CSV', included: true },
                     { text: 'Disparador inteligente Zapflow extensão', included: true },
+                    { text: 'Buscador de Grupos de WhatsApp', included: true },
                     { text: 'Suporte prioritário', included: true },
                     { text: 'Curso completo de renda extra', included: true },
                     { text: 'Grupo VIP de suporte', included: true },
