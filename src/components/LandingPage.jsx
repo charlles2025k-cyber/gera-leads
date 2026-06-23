@@ -26,7 +26,7 @@ export default function LandingPage({ onNavigateApp }) {
     },
     {
       q: "Preciso instalar algum programa?",
-      a: "Não! O Gera Leads funciona 100% no navegador, sem instalação. O ZapFlow é uma extensão do Chrome gratuita para quem assinar o plano Trimestral ou Anual."
+      a: "Não! O Gera Leads funciona 100% no navegador, sem instalação. O ZapFlow é uma extensão do Chrome gratuita para quem assinar o plano Anual."
     },
     {
       q: "Como funciona o disparo de WhatsApp?",
@@ -42,7 +42,7 @@ export default function LandingPage({ onNavigateApp }) {
     },
     {
       q: "Quanto posso buscar por mês?",
-      a: "Depende do seu plano: Mensal tem 500 leads/mês, Trimestral 1.500 leads/mês e Anual 5.000 leads/mês."
+      a: "Depende do seu plano: Mensal tem 500 leads/mês e Anual tem 1.500 leads/mês."
     }
   ];
 
@@ -354,23 +354,23 @@ export default function LandingPage({ onNavigateApp }) {
               </div>
             </div>
 
-            {/* Trimestral */}
+            {/* Anual */}
             <div className="p-8 rounded-2xl bg-[#0a0f1d]/50 backdrop-blur-xl flex flex-col justify-between hover:border-slate-700/80 transition-all shadow-xl" style={{ border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 -20px 80px -20px #8686f01f inset' }}>
               <div className="space-y-6">
                 <div>
                   <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-bold text-white font-display">Trimestral</h3>
+                    <h3 className="text-lg font-bold text-white font-display">Anual</h3>
                     <span className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full text-[9px] font-bold uppercase tracking-wider">Popular</span>
                   </div>
-                  <p className="text-slate-400 text-xs mt-1">Acesso completo por 3 meses.</p>
+                  <p className="text-slate-400 text-xs mt-1">Acesso completo por 12 meses.</p>
                 </div>
 
                 <div>
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-black text-white">R$ 197</span>
-                    <span className="text-slate-500 text-xs">/trimestre</span>
+                    <span className="text-slate-500 text-xs">/ano</span>
                   </div>
-                  <span className="text-[10px] text-emerald-400 font-bold block mt-1">Equivalente a R$ 65,66/mês</span>
+                  <span className="text-[10px] text-emerald-400 font-bold block mt-1">Equivalente a R$ 16,41/mês</span>
                 </div>
 
                 <ul className="space-y-3.5 text-xs text-slate-350 border-t border-slate-850 pt-6">
@@ -420,7 +420,7 @@ export default function LandingPage({ onNavigateApp }) {
                   rel="noreferrer"
                   className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-lg hover:shadow-indigo-500/10 active:scale-[0.98] cursor-pointer"
                 >
-                  Começar Trimestral
+                  Começar Anual
                   <ArrowRight className="w-3.5 h-3.5" />
                 </a>
               </div>

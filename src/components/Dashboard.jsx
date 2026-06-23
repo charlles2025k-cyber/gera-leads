@@ -295,7 +295,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
   const planNamePt = useMemo(() => {
     const plan = (profile?.plan || 'free').trim();
     if (plan === 'monthly') return 'Mensal';
-    if (plan === 'quarterly') return 'Trimestral';
+    if (plan === 'quarterly') return 'Anual';
     if (plan === 'annual') return 'Anual';
     return 'Gratuito';
   }, [profile]);
@@ -2231,10 +2231,10 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                   link: 'https://pay.cakto.com.br/mihqmub_933107'
                 },
                 {
-                  name: 'Trimestral',
+                  name: 'Anual',
                   price: 'R$ 197',
-                  period: '/trimestre',
-                  subPrice: 'equivalente a R$65,66/mês',
+                  period: '/ano',
+                  subPrice: 'equivalente a R$16,41/mês',
                   description: 'A melhor opção com acesso a todo o ecossistema e suporte VIP.',
                   features: [
                     { text: 'Até 1.500 leads por mês', included: true },
@@ -2349,7 +2349,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                   <span className="text-white font-bold block mt-1 text-sm">
                     {profile.plan === 'free' ? 'Gratuito' : 
                      profile.plan === 'monthly' ? 'Mensal' : 
-                     profile.plan === 'quarterly' ? 'Trimestral' : 
+                     profile.plan === 'quarterly' ? 'Anual' : 
                      profile.plan === 'annual' ? 'Anual' : profile.plan}
                   </span>
                 </div>
