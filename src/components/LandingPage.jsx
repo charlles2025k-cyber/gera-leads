@@ -1,22 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Search, Download, MessageSquare, RefreshCw, Key, 
   MapPin, Database, Check, ArrowRight, ShieldCheck, 
-  Sparkles, Layers, ChevronDown, X, Users
+  Sparkles, Layers, ChevronDown, X, Users,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 export default function LandingPage({ onNavigateApp }) {
-  const [activeFeature, setActiveFeature] = useState(0);
   const [openFaq, setOpenFaq] = useState(null);
-  const [fade, setFade] = useState(false);
+  const scrollRef = useRef(null);
 
-  const handleFeatureClick = (idx) => {
-    if (idx === activeFeature) return;
-    setFade(true);
-    setTimeout(() => {
-      setActiveFeature(idx);
-      setFade(false);
-    }, 200);
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const cardWidth = window.innerWidth < 640 ? clientWidth * 0.9 + 16 : 320 + 24;
+      const scrollTo = direction === 'left' 
+        ? scrollLeft - cardWidth 
+        : scrollLeft + cardWidth;
+      
+      scrollRef.current.scrollTo({
+        left: scrollTo,
+        behavior: 'smooth'
+      });
+    }
   };
 
   const faqData = [
@@ -80,17 +86,25 @@ export default function LandingPage({ onNavigateApp }) {
       img: "/screenshots/funil.png"
     },
     {
+      icon: Layers,
+      title: "Integração ZapFlow",
+      desc: "Extensão exclusiva para Chrome que se integra ao WhatsApp Web, permitindo gerenciar funis e prospecção diretamente na conversa.",
+      color: "from-purple-500 to-pink-600",
+      glowColor: "rgba(168, 85, 247, 0.15)",
+      img: "/screenshots/zapflow.png"
+    },
+    {
       icon: Users,
-      title: "Sistema de Grupos de WhatsApp",
+      title: "Sistema de Grupos WhatsApp",
       desc: "Busque links de grupos de WhatsApp divulgados em redes sociais e na internet para realizar abordagens em massa ou networking segmentado.",
       color: "from-indigo-500 to-purple-600",
       glowColor: "rgba(99, 102, 241, 0.15)",
-      img: "/screenshots/grupos.png"
+      img: "/screenshots/busca.png"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-[#070b13] text-slate-100 font-sans selection:bg-indigo-500/30 overflow-x-hidden">
+    <div className="relative min-h-screen bg-[#070b13] text-slate-100 font-sans selection:bg-indigo-500/30 overflow-x-hidden">
       
       {/* Glow Effects */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
@@ -99,7 +113,7 @@ export default function LandingPage({ onNavigateApp }) {
 
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[#070b13]/80 backdrop-blur-xl border-b border-slate-900/60 transition-all">
-        <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img 
               src="/logo.jpg" 
@@ -126,7 +140,7 @@ export default function LandingPage({ onNavigateApp }) {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-24 md:pt-28 md:pb-32 px-6">
+      <section className="relative overflow-hidden pt-20 pb-24 md:pt-28 md:pb-32 px-4 sm:px-6">
         <div
           style={{
             position: 'absolute',
@@ -139,34 +153,34 @@ export default function LandingPage({ onNavigateApp }) {
           }}
         />
         <div className="max-w-4xl mx-auto text-center space-y-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full text-xs font-semibold animate-pulse-soft">
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full text-[10px] sm:text-xs font-semibold animate-pulse-soft max-w-full justify-center">
+            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
             <span>Prospectador de Clientes B2B Automático</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black font-display text-white tracking-tight leading-[1.1] max-w-3xl mx-auto">
+          <h1 className="text-3xl sm:text-6xl font-black font-display text-white tracking-tight leading-[1.1] max-w-3xl mx-auto">
             Encontre clientes em segundos <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">para o seu negócio</span>
           </h1>
 
           <div className="max-w-2xl mx-auto space-y-4">
-            <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
+            <p className="text-slate-400 text-sm sm:text-lg leading-relaxed">
               Encontre empresas e clientes qualificados de forma automática através do Google Maps. Nossa plataforma utiliza um sistema inteligente de prospecção para identificar oportunidades reais, filtrar contatos relevantes e automatizar o envio de mensagens pelo WhatsApp.
             </p>
-            <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
+            <p className="text-slate-400 text-sm sm:text-lg leading-relaxed">
               Economize horas de trabalho manual, alcance mais clientes e aumente suas chances de fechar novos negócios com uma solução rápida, prática e eficiente.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 pt-4 w-full max-w-xs sm:max-w-none mx-auto">
             <a
               href="#pricing"
-              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-indigo-950/30 active:scale-[0.98] text-center"
+              className="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-indigo-950/30 active:scale-[0.98] text-center"
             >
               Começar agora
             </a>
             <a
               href="#pricing"
-              className="w-full sm:w-auto px-8 py-4 bg-slate-900/60 hover:bg-slate-850/80 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700 font-bold text-sm rounded-xl transition-all active:scale-[0.98] text-center"
+              className="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 bg-slate-900/60 hover:bg-slate-850/80 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700 font-bold text-sm rounded-xl transition-all active:scale-[0.98] text-center"
             >
               Ver planos
             </a>
@@ -201,9 +215,9 @@ export default function LandingPage({ onNavigateApp }) {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 border-t border-slate-900 bg-slate-950/20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto space-y-4 mb-16">
+      <section id="features" className="py-24 border-t border-slate-900 bg-slate-950/20 px-4 sm:px-6 relative overflow-hidden">
+        <div className="max-w-6xl mx-auto relative">
+          <div className="text-center max-w-2xl mx-auto space-y-4 mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold font-display text-white">
               Tudo o que você precisa para vender mais
             </h2>
@@ -212,64 +226,86 @@ export default function LandingPage({ onNavigateApp }) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left Side: Buttons */}
-            <div className="lg:col-span-5 space-y-3.5">
+          {/* Navigation Arrows & Container */}
+          <div className="relative group">
+            {/* Left Button */}
+            <button
+              onClick={() => scroll('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 sm:-translate-x-6 z-10 p-3 rounded-full bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700 shadow-xl backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-auto cursor-pointer"
+              aria-label="Previous features"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            {/* Right Button */}
+            <button
+              onClick={() => scroll('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 sm:translate-x-6 z-10 p-3 rounded-full bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700 shadow-xl backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-auto cursor-pointer"
+              aria-label="Next features"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+            {/* Scrollable Row */}
+            <div 
+              ref={scrollRef}
+              className="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-6 pt-2"
+              style={{
+                scrollbarWidth: 'none', /* Firefox */
+                msOverflowStyle: 'none', /* IE/Edge */
+              }}
+            >
+              <style>{`
+                div::-webkit-scrollbar {
+                  display: none !important;
+                }
+              `}</style>
+
               {features.map((feat, idx) => {
                 const Icon = feat.icon;
-                const isActive = activeFeature === idx;
                 return (
-                  <button
+                  <div
                     key={idx}
-                    onClick={() => handleFeatureClick(idx)}
-                    className={`w-full text-left p-5 rounded-2xl transition-all border flex items-start gap-4 cursor-pointer ${
-                      isActive 
-                        ? 'bg-slate-900/60 border-slate-800 shadow-xl' 
-                        : 'bg-transparent border-transparent hover:bg-slate-900/20 hover:border-slate-900/50'
-                    }`}
+                    className="snap-start shrink-0 w-[90%] sm:w-[320px] rounded-2xl border border-slate-850 bg-slate-950/40 p-6 flex flex-col justify-between shadow-lg backdrop-blur-sm relative overflow-hidden transition-all duration-300 hover:border-slate-800 hover:bg-slate-950/60"
                   >
-                    <div className={`p-2.5 rounded-xl bg-gradient-to-tr ${feat.color} text-white shrink-0 shadow-md`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className={`text-sm font-bold transition-colors ${isActive ? 'text-white' : 'text-slate-350'}`}>
+                    {/* Glow effect matching feature color */}
+                    <div 
+                      className="absolute top-0 right-0 w-[120px] h-[120px] rounded-full blur-[40px] opacity-10 pointer-events-none"
+                      style={{
+                        background: `radial-gradient(circle, ${feat.glowColor || 'rgba(99, 102, 241, 0.5)'} 0%, transparent 70%)`
+                      }}
+                    />
+
+                    {/* Top Row: Icon & Title */}
+                    <div className="space-y-4">
+                      <div className={`w-fit p-3 rounded-xl bg-gradient-to-tr ${feat.color} text-white shadow-md`}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-lg font-bold text-white font-display">
                         {feat.title}
                       </h3>
-                      <p className={`text-xs mt-1 leading-relaxed ${isActive ? 'text-slate-400' : 'text-slate-500'}`}>
-                        {isActive ? feat.desc : "Clique para ver detalhes"}
+                      <p className="text-xs text-slate-400 leading-relaxed min-h-[48px]">
+                        {feat.desc}
                       </p>
                     </div>
-                  </button>
+
+                    {/* Image Area */}
+                    <div className="mt-6 relative rounded-lg overflow-hidden border border-slate-900 bg-slate-950/80 aspect-[4/3] flex items-center justify-center">
+                      <img
+                        src={feat.img}
+                        alt={feat.title}
+                        className="max-h-full max-w-full object-contain rounded-lg p-1.5"
+                      />
+                      {/* Blur overlay for WhatsApp conversations */}
+                      {(feat.img === '/screenshots/disparo.png' || feat.img === '/screenshots/funil.png') && (
+                        <div 
+                          className="absolute inset-y-0 left-0 w-[34%] pointer-events-none backdrop-blur-[4px] bg-[#070b13]/10 border-r border-white/5 rounded-l-lg"
+                        />
+                      )}
+                    </div>
+                  </div>
                 );
               })}
-            </div>
-
-            {/* Right Side: Showcase Box */}
-            <div className="lg:col-span-7 flex justify-center items-center">
-              <div 
-                className={`relative rounded-2xl border border-slate-800/80 bg-slate-950/40 p-2 shadow-2xl backdrop-blur-xl h-[400px] w-full flex items-center justify-center overflow-hidden transition-all duration-300 ${
-                  fade ? 'opacity-40 scale-[0.98]' : 'opacity-100 scale-100'
-                }`}
-                style={{ 
-                  boxShadow: `0 20px 25px -5px ${features[activeFeature].glowColor}`
-                }}
-              >
-                <div className="relative max-h-full max-w-full flex items-center justify-center overflow-hidden rounded-xl border border-slate-800/50 bg-[#070b13]/10">
-                  <img 
-                    src={features[activeFeature].img} 
-                    alt={features[activeFeature].title}
-                    className="max-h-[384px] max-w-full object-contain rounded-xl"
-                  />
-
-                  {/* Blur overlay for WhatsApp conversations (left ~34% of the image for disparo/funil) */}
-                  {(features[activeFeature].img === '/screenshots/disparo.png' || features[activeFeature].img === '/screenshots/funil.png') ? (
-                    <div 
-                      className="absolute inset-y-0 left-0 w-[34%] pointer-events-none backdrop-blur-[6px] bg-[#070b13]/10 border-r border-white/5 rounded-l-xl"
-                      style={{ zIndex: 10 }}
-                    />
-                  ) : null}
-                </div>
-              </div>
             </div>
           </div>
         </div>

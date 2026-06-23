@@ -18,6 +18,7 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   background-color: #090d16;
   background-image: 
     radial-gradient(at 0% 0%, hsla(253, 22%, 7%, 1) 0, transparent 50%), 

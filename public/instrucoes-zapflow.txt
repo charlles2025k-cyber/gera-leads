@@ -1,0 +1,39 @@
+========================================
+   ZAPFLOW - INSTRUÇÕES DE INSTALAÇÃO
+========================================
+
+PASSO 1 — BAIXE O ARQUIVO
+Baixe o arquivo ZapFlow.zip que foi enviado para você.
+
+PASSO 2 — DESCOMPACTE
+Clique com o botão direito no arquivo ZapFlow.zip
+e selecione "Extrair aqui" ou "Extrair tudo".
+
+PASSO 3 — ABRA O CHROME
+Abra o Google Chrome e digite na barra de endereço:
+chrome://extensions
+Pressione Enter.
+
+PASSO 4 — ATIVE O MODO DESENVOLVEDOR
+No canto superior direito da página,
+ative o botão "Modo do desenvolvedor".
+
+PASSO 5 — CARREGUE A EXTENSÃO
+Clique em "Carregar sem compactação".
+Selecione a pasta descompactada.
+Clique em "Selecionar pasta".
+
+PASSO 6 — ABRA O ZAPFLOW
+Clique no ícone do ZapFlow na barra do Chrome.
+
+PASSO 7 — ATIVE SUA LICENÇA
+Cole sua chave de licença ZapFlow.
+Encontre sua chave em:
+https://gera-leads.vercel.app/app
+→ Login → Configurações → Chave ZapFlow → Copiar
+
+Clique em "Ativar" e pronto!
+
+========================================
+   SUPORTE: https://wa.me/5585988653086
+========================================

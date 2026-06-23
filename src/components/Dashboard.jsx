@@ -1551,14 +1551,20 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                   </span>
                 </div>
               ) : (
-                <div>
+                <div className="flex flex-wrap gap-4">
                   <a
-                    href="https://chrome.google.com/webstore/detail/placeholder-id"
-                    target="_blank"
-                    rel="noreferrer"
+                    href="/ZapFlow.zip"
+                    download="ZapFlow.zip"
                     className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-950/20 active:scale-[0.98] cursor-pointer"
                   >
                     Baixar Extensão ZapFlow
+                  </a>
+                  <a
+                    href="/instrucoes-zapflow.txt"
+                    download="instrucoes-zapflow.txt"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all border border-slate-750 active:scale-[0.98] cursor-pointer"
+                  >
+                    Baixar Instruções
                   </a>
                 </div>
               )}
