@@ -145,12 +145,17 @@ export default function LandingPage({ onNavigateApp }) {
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-black font-display text-white tracking-tight leading-[1.1] max-w-3xl mx-auto">
-            Encontre clientes em <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">segundos</span>
+            Encontre clientes em segundos <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">para o seu negócio</span>
           </h1>
 
-          <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Busque leads qualificados no Google Maps e dispare mensagens pelo WhatsApp automaticamente. Filtre estabelecimentos que não possuem website e aborde-os na hora!
-          </p>
+          <div className="max-w-2xl mx-auto space-y-4">
+            <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
+              Encontre empresas e clientes qualificados de forma automática através do Google Maps. Nossa plataforma utiliza um sistema inteligente de prospecção para identificar oportunidades reais, filtrar contatos relevantes e automatizar o envio de mensagens pelo WhatsApp.
+            </p>
+            <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
+              Economize horas de trabalho manual, alcance mais clientes e aumente suas chances de fechar novos negócios com uma solução rápida, prática e eficiente.
+            </p>
+          </div>
 
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
             <a
@@ -203,7 +208,7 @@ export default function LandingPage({ onNavigateApp }) {
               Tudo o que você precisa para vender mais
             </h2>
             <p className="text-slate-400 text-sm leading-relaxed">
-              Desenvolvemos um ecossistema completo focado em maximizar sua taxa de prospecção e fechamentos comerciais.
+              Plataforma completa focada em conectar você a clientes prontos para comprar seu produto ou serviço, seja digital ou físico, de forma rápida e eficiente.
             </p>
           </div>
 
@@ -275,7 +280,7 @@ export default function LandingPage({ onNavigateApp }) {
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto space-y-4 mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold font-display text-white">
-              Planos simples e transparentes
+              Conheça nossos Planos
             </h2>
             <p className="text-slate-400 text-sm leading-relaxed">
               Assine hoje e tenha acesso imediato à plataforma e suas funcionalidades exclusivas de prospecção.
