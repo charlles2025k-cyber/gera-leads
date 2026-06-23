@@ -1716,36 +1716,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
               <p className="text-slate-400 text-xs mt-1">Escolha a melhor assinatura para escalar suas prospecções de leads</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-              {/* Inline style for the pulsing animation of recommended card */}
-              <style>{`
-                @keyframes pulseGlow {
-                  0% {
-                    transform: scale(1.02);
-                    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.15), 0 4px 6px -4px rgba(99, 102, 241, 0.15), 0 0 0 0px rgba(99, 102, 241, 0.4);
-                  }
-                  50% {
-                    transform: scale(1.035);
-                    box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.3), 0 8px 10px -6px rgba(99, 102, 241, 0.3), 0 0 15px 5px rgba(99, 102, 241, 0.75);
-                  }
-                  100% {
-                    transform: scale(1.02);
-                    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.15), 0 4px 6px -4px rgba(99, 102, 241, 0.15), 0 0 0 0px rgba(99, 102, 241, 0.4);
-                  }
-                }
-
-                .pulse-trimestral {
-                  animation: pulseGlow 2s ease-in-out infinite;
-                }
-
-                @media (prefers-reduced-motion: reduce) {
-                  .pulse-trimestral {
-                    animation: none;
-                    transform: scale(1.02);
-                  }
-                }
-              `}</style>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch max-w-4xl mx-auto">
               {[
                 {
                   name: 'Mensal',
@@ -1766,28 +1737,6 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                   recommended: false,
                   buttonText: 'Testar agora',
                   link: 'https://pay.cakto.com.br/mihqmub_933107'
-                },
-                {
-                  name: 'Trimestral',
-                  price: 'R$ 97',
-                  period: '/trimestre',
-                  subPrice: 'equivalente a R$1,08/dia',
-                  description: 'O melhor custo-benefício para aceleração de prospecção.',
-                  features: [
-                    { text: 'Até 1.500 leads por mês', included: true },
-                    { text: 'Acesso completo ao Google Places Crawler', included: true },
-                    { text: 'Filtro automático de leads sem website', included: true },
-                    { text: 'Exportação ilimitada para CSV', included: true },
-                    { text: 'Disparador inteligente', included: true },
-                    { text: 'Suporte prioritário', included: true },
-                    { text: 'Curso completo de renda extra', included: true },
-                    { text: 'R$97 ao invés de R$141 — economize R$44', included: true },
-                    { text: 'Grupo VIP de suporte', included: false },
-                    { text: 'Reuniões mensais com estratégias', included: false }
-                  ],
-                  recommended: true,
-                  buttonText: 'Quero economizar',
-                  link: 'https://pay.cakto.com.br/36bmrgk'
                 },
                 {
                   name: 'Anual',
@@ -1817,7 +1766,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                   key={idx}
                   className={`p-6 rounded-2xl bg-slate-900/60 backdrop-blur-xl border flex flex-col justify-between transition-all relative ${
                     plan.recommended 
-                      ? 'border-indigo-500 pulse-trimestral' 
+                      ? 'border-indigo-500' 
                       : 'border-slate-800/80 shadow-md'
                   }`}
                 >

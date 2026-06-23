@@ -345,7 +345,7 @@ export default function LandingPage({ onNavigateApp }) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch max-w-3xl mx-auto">
             {/* Mensal */}
             <div className="p-8 rounded-2xl bg-[#0a0f1d]/50 backdrop-blur-xl flex flex-col justify-between hover:border-slate-700/80 transition-all shadow-xl" style={{ border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 -20px 80px -20px #8686f01f inset' }}>
               <div className="space-y-6">
@@ -387,72 +387,6 @@ export default function LandingPage({ onNavigateApp }) {
                   className="w-full py-3.5 bg-slate-800 hover:bg-slate-750 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-md"
                 >
                   Começar Mensal
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </a>
-              </div>
-            </div>
-
-            {/* Trimestral */}
-            <div className="p-8 rounded-2xl bg-[#0a0f1d]/50 backdrop-blur-xl flex flex-col justify-between hover:border-slate-700/80 transition-all shadow-2xl relative overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 -20px 80px -20px #8686f01f inset' }}>
-              {/* Popular Tag */}
-              <div className="absolute top-0 right-0 bg-indigo-500 text-white px-4 py-1 rounded-bl-xl text-[10px] font-black uppercase tracking-wider">
-                Melhor Custo-Benefício
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold text-white font-display">Trimestral</h3>
-                  <p className="text-slate-400 text-xs mt-1">O preferido dos profissionais autônomos.</p>
-                </div>
-
-                <div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-white">R$ 97</span>
-                    <span className="text-slate-500 text-xs">/trimestre</span>
-                  </div>
-                  <span className="text-[10px] text-indigo-400 font-bold block mt-1">Economize R$44</span>
-                </div>
-
-                <ul className="space-y-3.5 text-xs text-slate-300 border-t border-slate-850 pt-6">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>1.500 leads por mês</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Google Places Crawler</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Filtro de leads sem website</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Exportação para CSV</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Disparador inteligente WhatsApp</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Curso Renda Extra</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Suporte Prioritário</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="pt-8">
-                <a
-                  href="https://pay.cakto.com.br/36bmrgk"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-lg shadow-indigo-950/40"
-                >
-                  Começar Trimestral
                   <ArrowRight className="w-3.5 h-3.5" />
                 </a>
               </div>
