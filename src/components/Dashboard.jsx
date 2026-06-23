@@ -79,6 +79,14 @@ export default function Dashboard({ user, onLogout, showAlert }) {
     message: ''
   });
 
+  // WhatsApp Groups States
+  const [groupNiche, setGroupNiche] = useState('barbearia');
+  const [groupCity, setGroupCity] = useState('Fortaleza');
+  const [groupPlatform, setGroupPlatform] = useState('facebook.com');
+  const [searchingGroups, setSearchingGroups] = useState(false);
+  const [groupResults, setGroupResults] = useState([]);
+  const [groupError, setGroupError] = useState('');
+
   // Calculate ZapFlow 7-day guarantee lock remaining time
   useEffect(() => {
     if (!zapflowLicense || !zapflowLicense.created_at) {
@@ -453,7 +461,120 @@ export default function Dashboard({ user, onLogout, showAlert }) {
     setDispatching(false);
   };
 
-  // Perform search
+  // WhatsApp Groups Search Function
+  const handleGroupSearch = async (e) => {
+    e.preventDefault();
+    setGroupError('');
+    setGroupResults([]);
+    setSearchingGroups(true);
+
+    if (!apiKey) {
+      const errorMsg = 'Por favor, configure e salve sua API Key do Apify para realizar buscas.';
+      setGroupError(errorMsg);
+      if (showAlert) showAlert(errorMsg, 'warning');
+      setSearchingGroups(false);
+      return;
+    }
+
+    if (!groupNiche.trim()) {
+      const errorMsg = 'Por favor, informe o nicho para a busca.';
+      setGroupError(errorMsg);
+      if (showAlert) showAlert(errorMsg, 'warning');
+      setSearchingGroups(false);
+      return;
+    }
+
+    const cleanNiche = groupNiche.trim();
+    const cleanCity = groupCity.trim();
+    const queryParts = [];
+    queryParts.push(`"${cleanNiche}"`);
+    if (cleanCity) {
+      queryParts.push(`"${cleanCity}"`);
+    }
+    queryParts.push('"chat.whatsapp.com"');
+    queryParts.push(`site:${groupPlatform}`);
+    
+    const queryStr = queryParts.join(' ');
+
+    try {
+      const response = await fetch(
+        `https://api.apify.com/v2/acts/apify~google-search-scraper/run-sync-get-dataset-items?token=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            queries: queryStr,
+            maxPagesPerQuery: 1,
+            resultsPerPage: 100,
+            countryCode: "br",
+            languageCode: "pt-br"
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Falha na API do Apify (${response.status}): ${errText || response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      if (Array.isArray(data)) {
+        const parsed = [];
+        const regex = /chat\.whatsapp\.com\/[a-zA-Z0-9\-_]{22}/i;
+
+        data.forEach(page => {
+          if (page.organicResults && Array.isArray(page.organicResults)) {
+            page.organicResults.forEach(item => {
+              let groupLink = null;
+              if (item.url && item.url.includes('chat.whatsapp.com')) {
+                groupLink = item.url;
+              } else {
+                const match = (item.description || '').match(regex) || 
+                              (item.title || '').match(regex) || 
+                              (item.url || '').match(regex);
+                if (match) {
+                  groupLink = `https://${match[0]}`;
+                }
+              }
+
+              if (groupLink) {
+                parsed.push({
+                  groupLink,
+                  sourceUrl: item.url || item.displayedUrl || '',
+                  title: item.title || 'Sem título',
+                  description: item.description || ''
+                });
+              }
+            });
+          }
+        });
+
+        const uniqueParsed = [];
+        const seenLinks = new Set();
+        parsed.forEach(item => {
+          if (!seenLinks.has(item.groupLink)) {
+            seenLinks.add(item.groupLink);
+            uniqueParsed.push(item);
+          }
+        });
+
+        setGroupResults(uniqueParsed);
+        if (showAlert) showAlert(`Busca concluída! Encontramos ${uniqueParsed.length} grupos de WhatsApp.`, 'success');
+      } else {
+        throw new Error('Formato de dados retornado inválido. Esperava-se uma lista.');
+      }
+    } catch (err) {
+      console.error(err);
+      setGroupError(`Erro ao buscar grupos no Apify: ${err.message}`);
+      if (showAlert) showAlert(`Erro ao buscar grupos: ${err.message}`, 'error');
+    } finally {
+      setSearchingGroups(false);
+    }
+  };
+
   const handleSearch = async (e) => {
     e.preventDefault();
     setError('');
@@ -824,6 +945,17 @@ export default function Dashboard({ user, onLogout, showAlert }) {
               Gerar Leads
             </button>
             <button
+              onClick={() => setActiveTab('whatsapp_groups')}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border border-transparent cursor-pointer ${
+                activeTab === 'whatsapp_groups'
+                  ? 'bg-indigo-600/10 text-indigo-400 border-indigo-500/20 font-bold'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-850/30'
+              }`}
+            >
+              <MessageSquare className="w-4 h-4" />
+              Grupos WhatsApp
+            </button>
+            <button
               onClick={() => {
                 if (userPlan === 'monthly' || userPlan === 'quarterly' || userPlan === 'annual') {
                   setActiveTab('course');
@@ -965,6 +1097,15 @@ export default function Dashboard({ user, onLogout, showAlert }) {
         >
           <Search className="w-4 h-4" />
           Buscar
+        </button>
+        <button
+          onClick={() => setActiveTab('whatsapp_groups')}
+          className={`flex flex-col items-center gap-1 text-[9px] font-semibold transition-colors cursor-pointer ${
+            activeTab === 'whatsapp_groups' ? 'text-indigo-400 font-bold' : 'text-slate-500'
+          }`}
+        >
+          <MessageSquare className="w-4 h-4" />
+          Grupos
         </button>
         <button
           onClick={() => {
@@ -1706,6 +1847,207 @@ export default function Dashboard({ user, onLogout, showAlert }) {
             </div>
           </div>
         )
+      )}
+
+      {/* Tab: Grupos WhatsApp */}
+      {activeTab === 'whatsapp_groups' && (
+        <div className="space-y-8 animate-fade-in">
+          {/* Header */}
+          <div className="border-b border-slate-900 pb-5">
+            <h2 className="text-2xl font-bold font-display text-white">Grupos WhatsApp</h2>
+            <p className="text-slate-400 text-xs mt-1">Busque links de grupos do WhatsApp divulgados em redes sociais</p>
+          </div>
+
+          {/* Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Form */}
+            <div className="lg:col-span-4 space-y-6">
+              <div className="p-6 rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 shadow-xl">
+                <div className="flex items-center gap-2 mb-6 border-b border-slate-800 pb-3">
+                  <Sliders className="w-5 h-5 text-indigo-400" />
+                  <h3 className="text-sm font-bold font-display text-white">Parâmetros de Busca</h3>
+                </div>
+
+                <form onSubmit={handleGroupSearch} className="space-y-5">
+                  <div>
+                    <label className="block text-slate-350 text-xs font-semibold mb-1.5">Nicho</label>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                        <Search className="w-4 h-4" />
+                      </span>
+                      <input
+                        type="text"
+                        className="w-full pl-9 pr-4 py-2.5 bg-slate-950/50 border border-slate-850 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl text-xs text-white placeholder-slate-650 outline-none transition-all"
+                        placeholder="Ex: barbearia, marketing, vendas"
+                        value={groupNiche}
+                        onChange={(e) => setGroupNiche(e.target.value)}
+                        disabled={searchingGroups}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-355 text-xs font-semibold mb-1.5">Cidade (Opcional)</label>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                        <MapPin className="w-4 h-4" />
+                      </span>
+                      <input
+                        type="text"
+                        className="w-full pl-9 pr-4 py-2.5 bg-slate-950/50 border border-slate-850 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl text-xs text-white placeholder-slate-650 outline-none transition-all"
+                        placeholder="Ex: Fortaleza, São Paulo"
+                        value={groupCity}
+                        onChange={(e) => setGroupCity(e.target.value)}
+                        disabled={searchingGroups}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-355 text-xs font-semibold mb-1.5">Plataforma</label>
+                    <select
+                      className="w-full px-3 py-2.5 bg-slate-950/50 border border-slate-850 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl text-xs text-white outline-none transition-all cursor-pointer"
+                      value={groupPlatform}
+                      onChange={(e) => setGroupPlatform(e.target.value)}
+                      disabled={searchingGroups}
+                      required
+                    >
+                      <option value="facebook.com" className="bg-[#070b13]">Facebook</option>
+                      <option value="instagram.com" className="bg-[#070b13]">Instagram</option>
+                      <option value="tiktok.com" className="bg-[#070b13]">TikTok</option>
+                      <option value="linkedin.com" className="bg-[#070b13]">LinkedIn</option>
+                      <option value="twitter.com" className="bg-[#070b13]">Twitter</option>
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg hover:shadow-blue-500/10 active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    disabled={searchingGroups}
+                  >
+                    {searchingGroups ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        Buscando...
+                      </>
+                    ) : (
+                      <>
+                        <Database className="w-4 h-4" />
+                        Buscar Grupos
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* Data Grid View */}
+            <div className="lg:col-span-8">
+              {groupError && (
+                <div className="p-4 mb-6 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-start gap-3 text-xs animate-fade-in">
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  <div>
+                    <span className="font-bold block">Erro na Consulta</span>
+                    <span className="mt-1 block leading-relaxed">{groupError}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-6 shadow-xl min-h-[500px] flex flex-col justify-between">
+                {searchingGroups ? (
+                  <div className="flex-1 flex flex-col justify-center items-center py-12">
+                    <div className="relative mb-6">
+                      <div className="w-16 h-16 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
+                      <MessageSquare className="w-6 h-6 text-indigo-400 absolute inset-0 m-auto animate-pulse" />
+                    </div>
+                    <h4 className="text-white text-base font-semibold font-display mb-2">Processando Busca</h4>
+                    <p className="text-slate-400 text-xs text-center max-w-sm px-4 leading-relaxed animate-pulse">
+                      Fazendo a busca e garimpando links de convite do WhatsApp no Google...
+                    </p>
+                  </div>
+                ) : groupResults.length > 0 ? (
+                  <div className="flex-grow flex flex-col h-full">
+                    {/* Action headers */}
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 border-b border-slate-800 pb-5">
+                      <div>
+                        <h3 className="text-white font-bold font-display text-base flex items-center gap-2">
+                          <CheckCircle className="w-5 h-5 text-emerald-400" />
+                          Grupos Encontrados
+                        </h3>
+                        <p className="text-slate-400 text-xs mt-1">
+                          Mapeamos {groupResults.length} grupos únicos com base na sua pesquisa.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Results table */}
+                    <div className="overflow-x-auto border border-slate-800/80 rounded-xl flex-grow bg-slate-950/20">
+                      <table className="w-full text-left border-collapse text-xs">
+                        <thead>
+                          <tr className="bg-slate-900/40 text-slate-350 border-b border-slate-800/80 font-semibold">
+                            <th className="p-4">Link do Grupo</th>
+                            <th className="p-4">Título do Resultado</th>
+                            <th className="p-4">Origem</th>
+                            <th className="p-4 text-center">Ação</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-850/60 text-slate-305">
+                          {groupResults.map((item, idx) => (
+                            <tr 
+                              key={idx} 
+                              className="hover:bg-slate-800/30 transition-colors"
+                            >
+                              <td className="p-4 font-semibold text-indigo-400 font-mono select-all">
+                                {item.groupLink}
+                              </td>
+                              <td className="p-4 max-w-[200px] truncate text-slate-200" title={item.title}>
+                                {item.title}
+                              </td>
+                              <td className="p-4 max-w-[150px] truncate text-slate-400" title={item.sourceUrl}>
+                                <a 
+                                  href={item.sourceUrl} 
+                                  target="_blank" 
+                                  rel="noreferrer" 
+                                  className="hover:underline flex items-center gap-1 text-slate-450 hover:text-slate-200"
+                                >
+                                  <span>{item.sourceUrl.split('/')[2] || 'Origem'}</span>
+                                  <ExternalLink className="w-3 h-3" />
+                                </a>
+                              </td>
+                              <td className="p-4 text-center">
+                                <a
+                                  href={item.groupLink}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="px-3 py-1.5 bg-green-600/15 border border-green-500/30 text-green-400 hover:bg-green-600 hover:text-white rounded-xl text-[10px] font-bold transition-all inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                                >
+                                  Entrar no Grupo
+                                </a>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex-grow flex flex-col justify-center items-center py-12 text-center">
+                    <div className="p-4 bg-slate-950/50 text-slate-655 rounded-2xl border border-slate-800/60 mb-4">
+                      <FileSpreadsheet className="w-12 h-12" />
+                    </div>
+                    <h4 className="text-white text-base font-bold font-display mb-1.5">Sem resultados para exibir</h4>
+                    <p className="text-slate-400 text-xs max-w-sm px-6 leading-relaxed">
+                      Preencha os termos de nicho, cidade e escolha a plataforma ao lado para buscar os links de convite indexados.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
       )}
 
         {/* Tab 3: Planos */}
