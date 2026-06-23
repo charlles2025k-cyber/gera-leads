@@ -509,7 +509,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
             maxPagesPerQuery: 1,
             resultsPerPage: 100,
             countryCode: "br",
-            languageCode: "pt-br"
+            languageCode: "pt"
           })
         }
       );
