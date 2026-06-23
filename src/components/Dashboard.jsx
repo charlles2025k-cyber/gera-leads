@@ -70,6 +70,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
   const [zapflowLicense, setZapflowLicense] = useState(null);
   const [loadingLicense, setLoadingLicense] = useState(true);
   const [copiedKey, setCopiedKey] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(null);
 
   // Modal Lock State
   const [lockModal, setLockModal] = useState({
@@ -77,6 +78,44 @@ export default function Dashboard({ user, onLogout, showAlert }) {
     title: '',
     message: ''
   });
+
+  // Calculate ZapFlow 7-day guarantee lock remaining time
+  useEffect(() => {
+    if (!zapflowLicense || !zapflowLicense.created_at) {
+      setTimeRemaining(null);
+      return;
+    }
+
+    const calculateTimeRemaining = () => {
+      const createdTime = new Date(zapflowLicense.created_at).getTime();
+      const targetTime = createdTime + 7 * 24 * 60 * 60 * 1000;
+      const now = new Date().getTime();
+      const diff = targetTime - now;
+
+      if (diff <= 0) {
+        setTimeRemaining(null);
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      setTimeRemaining({
+        days,
+        hours,
+        minutes,
+        seconds,
+        totalMs: diff
+      });
+    };
+
+    calculateTimeRemaining();
+    const interval = setInterval(calculateTimeRemaining, 1000);
+
+    return () => clearInterval(interval);
+  }, [zapflowLicense]);
 
   // Load API key, profile, usage and history on mount
   useEffect(() => {
@@ -182,7 +221,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
       if (session) {
         const { data, error } = await supabase
           .from('zapflow_licenses')
-          .select('license_key, disparos_usados, disparos_limite, plan_type')
+          .select('license_key, disparos_usados, disparos_limite, plan_type, created_at')
           .eq('user_id', session.user.id)
           .maybeSingle();
 
@@ -836,6 +875,43 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                 <Lock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
               )}
             </button>
+
+            <button
+              onClick={() => {
+                if (userPlan === 'quarterly' || userPlan === 'annual') {
+                  if (timeRemaining) {
+                    setLockModal({
+                      isOpen: true,
+                      title: 'Acesso Restrito',
+                      message: `Acesso liberado em ${Math.ceil(timeRemaining.totalMs / (1000 * 60 * 60 * 24))} dias. O período de garantia de 7 dias precisa ser concluído.`
+                    });
+                  } else {
+                    window.open('https://t.me/+GCtked4jQ0ZmYWYx', '_blank');
+                  }
+                } else {
+                  setLockModal({
+                    isOpen: true,
+                    title: 'Canal do Telegram Bloqueado',
+                    message: 'Faça upgrade do seu plano para acessar o canal do Telegram.'
+                  });
+                }
+              }}
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border border-transparent cursor-pointer text-slate-400 hover:text-white hover:bg-slate-850/30"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <Send className="w-4 h-4 shrink-0" />
+                <span className="truncate">Telegram</span>
+              </div>
+              {userPlan !== 'quarterly' && userPlan !== 'annual' ? (
+                <Lock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+              ) : (
+                timeRemaining && (
+                  <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold text-red-400 bg-red-500/10 border border-red-500/20 rounded-md shrink-0">
+                    {timeRemaining.days}d {String(timeRemaining.hours).padStart(2, '0')}:{String(timeRemaining.minutes).padStart(2, '0')}
+                  </span>
+                )
+              )}
+            </button>
             <button
               onClick={() => setActiveTab('plans')}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border border-transparent cursor-pointer ${
@@ -1035,6 +1111,11 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                     <span className="text-amber-400 text-xs font-semibold block mt-1.5">Nenhum plano ativo</span>
                   ) : (
                     <div className="mt-1.5 space-y-3">
+                      {timeRemaining && (
+                        <div className="text-[9px] font-semibold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-md inline-flex items-center gap-1 animate-pulse w-full justify-center">
+                          Liberação total em {timeRemaining.days} dias {String(timeRemaining.hours).padStart(2, '0')}:{String(timeRemaining.minutes).padStart(2, '0')}:{String(timeRemaining.seconds).padStart(2, '0')}
+                        </div>
+                      )}
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-xs font-mono text-slate-200 truncate" title={zapflowLicense.license_key}>
                           {zapflowLicense.license_key}
@@ -1169,7 +1250,51 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                   allowFullScreen
                   className="w-full h-full"
                 ></iframe>
+            </div>
+          </div>
+
+          {/* Extensão ZapFlow Download Card */}
+            <div className="p-6 md:p-8 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl space-y-6">
+              <div className="border-b border-slate-800/60 pb-4">
+                <h3 className="text-lg font-bold font-display text-white">Baixar Extensão ZapFlow</h3>
+                <p className="text-slate-400 text-xs mt-1">Baixe a extensão oficial para realizar envios integrados em massa.</p>
               </div>
+              
+              {userPlan !== 'quarterly' && userPlan !== 'annual' ? (
+                <div className="p-4 bg-slate-950/50 border border-slate-850/60 text-slate-400 rounded-xl text-xs flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-slate-500 shrink-0" />
+                    <span>A extensão ZapFlow está disponível apenas para os planos Trimestral e Anual.</span>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('plans')}
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    Fazer Upgrade
+                  </button>
+                </div>
+              ) : timeRemaining ? (
+                <div className="p-4 bg-red-500/5 border border-red-500/10 text-red-400 rounded-xl text-xs flex flex-col sm:flex-row justify-between items-center gap-4 animate-pulse">
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-red-400 shrink-0" />
+                    <span>O download da extensão estará disponível após o período de garantia.</span>
+                  </div>
+                  <span className="font-mono font-bold whitespace-nowrap">
+                    Liberação em {timeRemaining.days}d {String(timeRemaining.hours).padStart(2, '0')}:{String(timeRemaining.minutes).padStart(2, '0')}:{String(timeRemaining.seconds).padStart(2, '0')}
+                  </span>
+                </div>
+              ) : (
+                <div>
+                  <a
+                    href="https://chrome.google.com/webstore/detail/placeholder-id"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-950/20 active:scale-[0.98] cursor-pointer"
+                  >
+                    Baixar Extensão ZapFlow
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         )}
