@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Search, Download, MessageSquare, RefreshCw, Key, 
   MapPin, Database, Check, ArrowRight, ShieldCheck, 
-  Sparkles, Layers, ChevronDown
+  Sparkles, Layers, ChevronDown, X
 } from 'lucide-react';
 
 export default function LandingPage({ onNavigateApp }) {
@@ -179,74 +179,16 @@ export default function LandingPage({ onNavigateApp }) {
                 <span className="w-3 h-3 rounded-full bg-green-500/30" />
               </div>
 
-              {/* Pseudo UI representation of the Dashboard */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 text-left">
-                {/* Sidebar */}
-                <div className="md:col-span-3 space-y-4 pr-2 border-r border-slate-900/60 hidden md:block">
-                  <div className="h-6 w-24 bg-slate-800/40 rounded-lg animate-pulse" />
-                  <div className="space-y-2">
-                    <div className="h-9 bg-indigo-600/10 border border-indigo-500/20 rounded-xl flex items-center px-3 gap-2">
-                      <div className="w-3.5 h-3.5 rounded bg-indigo-400" />
-                      <div className="h-3 w-16 bg-indigo-300/40 rounded" />
-                    </div>
-                    {[1, 2, 3].map(i => (
-                      <div key={i} className="h-9 hover:bg-slate-900/30 rounded-xl flex items-center px-3 gap-2">
-                        <div className="w-3.5 h-3.5 rounded bg-slate-700" />
-                        <div className="h-3 w-16 bg-slate-650 rounded" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Main Content Pane */}
-                <div className="md:col-span-9 space-y-5 pl-0 md:pl-2">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div className="space-y-1.5">
-                      <div className="h-5 w-32 bg-slate-250 rounded-lg" />
-                      <div className="h-3.5 w-48 bg-slate-500/40 rounded" />
-                    </div>
-                    <div className="h-8 w-24 bg-emerald-600/20 border border-emerald-500/20 rounded-lg" />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {[
-                      { l: "Buscas Ativas", v: "148" },
-                      { l: "Leads Coletados", v: "2.842" },
-                      { l: "Taxa de Resposta", v: "18.4%" }
-                    ].map((card, idx) => (
-                      <div key={idx} className="p-4 bg-slate-900/40 border border-slate-850 rounded-xl">
-                        <span className="text-[10px] text-slate-500 block font-semibold uppercase tracking-wider">{card.l}</span>
-                        <span className="text-xl font-bold text-white block mt-1">{card.v}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Dummy Table */}
-                  <div className="border border-slate-850 rounded-xl overflow-hidden bg-slate-950/20">
-                    <div className="bg-slate-900/20 p-3 border-b border-slate-850 flex justify-between">
-                      <div className="h-3 w-28 bg-slate-600/40 rounded" />
-                      <div className="h-3 w-12 bg-slate-600/40 rounded" />
-                    </div>
-                    <div className="p-3 space-y-3">
-                      {[
-                        { n: "Barbearia do João", e: "Fortaleza, CE", s: "Sem Site", p: "📱 WhatsApp" },
-                        { n: "Pet Shop Amigo Animal", e: "Fortaleza, CE", s: "Sem Site", p: "📱 WhatsApp" }
-                      ].map((row, idx) => (
-                        <div key={idx} className="flex justify-between items-center text-[11px] border-b border-slate-900 last:border-0 pb-2 last:pb-0">
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-slate-200">{row.n}</span>
-                            <span className="text-[10px] text-slate-500">{row.e}</span>
-                          </div>
-                          <div className="flex gap-2">
-                            <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">{row.s}</span>
-                            <span className="px-2 py-0.5 rounded bg-green-600/15 border border-green-500/30 text-green-400 font-semibold">{row.p}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                </div>
+              {/* YouTube Video Embed inside macOS window */}
+              <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-inner border border-slate-900 bg-black">
+                <iframe
+                  src="https://www.youtube.com/embed/Azr1ZHIIOpE?start=637"
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                ></iframe>
               </div>
             </div>
           </div>
@@ -355,26 +297,46 @@ export default function LandingPage({ onNavigateApp }) {
                 </div>
 
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-white">R$ 47</span>
+                  <span className="text-4xl font-black text-white">R$ 67</span>
                   <span className="text-slate-500 text-xs">/mês</span>
                 </div>
 
                 <ul className="space-y-3.5 text-xs text-slate-350 border-t border-slate-850 pt-6">
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>500 leads por mês</span>
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Até 500 leads por mês</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Google Places Crawler</span>
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Acesso completo ao Google Places Crawler</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Filtro de leads sem website</span>
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Filtro automático de leads sem website</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Exportação para CSV</span>
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Exportação ilimitada para CSV</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Disparador inteligente Zapflow extensão</span>
+                  </li>
+                  <li className="flex items-center gap-2 opacity-40">
+                    <X className="w-4 h-4 text-red-500 shrink-0" />
+                    <span className="line-through">Suporte prioritário</span>
+                  </li>
+                  <li className="flex items-center gap-2 opacity-40">
+                    <X className="w-4 h-4 text-red-500 shrink-0" />
+                    <span className="line-through">Curso completo de renda extra</span>
+                  </li>
+                  <li className="flex items-center gap-2 opacity-40">
+                    <X className="w-4 h-4 text-red-500 shrink-0" />
+                    <span className="line-through">Grupo VIP de suporte</span>
+                  </li>
+                  <li className="flex items-center gap-2 opacity-40">
+                    <X className="w-4 h-4 text-red-500 shrink-0" />
+                    <span className="line-through">Reuniões mensais com estratégias</span>
                   </li>
                 </ul>
               </div>
@@ -392,50 +354,61 @@ export default function LandingPage({ onNavigateApp }) {
               </div>
             </div>
 
-            {/* Anual */}
+            {/* Trimestral */}
             <div className="p-8 rounded-2xl bg-[#0a0f1d]/50 backdrop-blur-xl flex flex-col justify-between hover:border-slate-700/80 transition-all shadow-xl" style={{ border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 -20px 80px -20px #8686f01f inset' }}>
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-bold text-white font-display">Anual</h3>
-                  <p className="text-slate-400 text-xs mt-1">Para agências e equipes consolidadas.</p>
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-bold text-white font-display">Trimestral</h3>
+                    <span className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full text-[9px] font-bold uppercase tracking-wider">Popular</span>
+                  </div>
+                  <p className="text-slate-400 text-xs mt-1">Acesso completo por 3 meses.</p>
                 </div>
 
                 <div>
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-black text-white">R$ 197</span>
-                    <span className="text-slate-500 text-xs">/ano</span>
+                    <span className="text-slate-500 text-xs">/trimestre</span>
                   </div>
-                  <span className="text-[10px] text-emerald-400 font-bold block mt-1">Economize R$367</span>
+                  <span className="text-[10px] text-emerald-400 font-bold block mt-1">Equivalente a R$ 65,66/mês</span>
                 </div>
 
                 <ul className="space-y-3.5 text-xs text-slate-350 border-t border-slate-850 pt-6">
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>5.000 leads por mês</span>
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Até 1.500 leads por mês</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Google Places Crawler</span>
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Acesso completo ao Google Places Crawler</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Filtro de leads sem website</span>
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Filtro automático de leads sem website</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Exportação para CSV</span>
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Exportação ilimitada para CSV</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Disparador inteligente WhatsApp</span>
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Disparador inteligente Zapflow extensão</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Curso Renda Extra</span>
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Suporte prioritário</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Grupo VIP de suporte + Encontros</span>
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Curso completo de renda extra</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Grupo VIP de suporte</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Reuniões mensais com estratégias</span>
                   </li>
                 </ul>
               </div>
@@ -445,9 +418,9 @@ export default function LandingPage({ onNavigateApp }) {
                   href="https://pay.cakto.com.br/cx86ktu"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full py-3.5 bg-slate-800 hover:bg-slate-750 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-md"
+                  className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-lg hover:shadow-indigo-500/10 active:scale-[0.98] cursor-pointer"
                 >
-                  Começar Anual
+                  Começar Trimestral
                   <ArrowRight className="w-3.5 h-3.5" />
                 </a>
               </div>

@@ -1075,7 +1075,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
             </button>
             <button
               onClick={() => {
-                if (userPlan === 'monthly' || userPlan === 'quarterly' || userPlan === 'annual') {
+                if (userPlan === 'quarterly' || userPlan === 'annual') {
                   setActiveTab('course');
                 } else {
                   setLockModal({
@@ -1095,13 +1095,13 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                 <BookOpen className="w-4 h-4" />
                 Curso
               </div>
-              {userPlan !== 'monthly' && userPlan !== 'quarterly' && userPlan !== 'annual' && (
+              {userPlan !== 'quarterly' && userPlan !== 'annual' && (
                 <Lock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
               )}
             </button>
             <button
               onClick={() => {
-                if (userPlan === 'annual') {
+                if (userPlan === 'quarterly' || userPlan === 'annual') {
                   setActiveTab('vip');
                 } else {
                   setLockModal({
@@ -1121,7 +1121,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                 <Users className="w-4 h-4" />
                 Grupo VIP
               </div>
-              {userPlan !== 'annual' && (
+              {userPlan !== 'quarterly' && userPlan !== 'annual' && (
                 <Lock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
               )}
             </button>
@@ -1227,7 +1227,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
         </button>
         <button
           onClick={() => {
-            if (userPlan === 'monthly' || userPlan === 'quarterly' || userPlan === 'annual') {
+            if (userPlan === 'quarterly' || userPlan === 'annual') {
               setActiveTab('course');
             } else {
               setLockModal({
@@ -1243,7 +1243,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
         >
           <div className="relative">
             <BookOpen className="w-4 h-4" />
-            {userPlan !== 'monthly' && userPlan !== 'quarterly' && userPlan !== 'annual' && (
+            {userPlan !== 'quarterly' && userPlan !== 'annual' && (
               <Lock className="w-2.5 h-2.5 text-slate-500 absolute -top-1.5 -right-1.5 bg-[#0a0f1b] rounded-full p-0.5" />
             )}
           </div>
@@ -1251,7 +1251,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
         </button>
         <button
           onClick={() => {
-            if (userPlan === 'annual') {
+            if (userPlan === 'quarterly' || userPlan === 'annual') {
               setActiveTab('vip');
             } else {
               setLockModal({
@@ -1267,7 +1267,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
         >
           <div className="relative">
             <Users className="w-4 h-4" />
-            {userPlan !== 'annual' && (
+            {userPlan !== 'quarterly' && userPlan !== 'annual' && (
               <Lock className="w-2.5 h-2.5 text-slate-500 absolute -top-1.5 -right-1.5 bg-[#0a0f1b] rounded-full p-0.5" />
             )}
           </div>
@@ -1494,7 +1494,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
         )}
 
         {/* Tab: Curso */}
-        {activeTab === 'course' && (userPlan === 'monthly' || userPlan === 'quarterly' || userPlan === 'annual') && (
+        {activeTab === 'course' && (userPlan === 'quarterly' || userPlan === 'annual') && (
           <div className="space-y-8 animate-fade-in max-w-4xl mx-auto">
             <div className="border-b border-slate-900 pb-5">
               <h2 className="text-2xl font-bold font-display text-white">Curso Renda Extra</h2>
@@ -1524,14 +1524,14 @@ export default function Dashboard({ user, onLogout, showAlert }) {
             <div className="p-6 md:p-8 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl space-y-6">
               <div className="border-b border-slate-800/60 pb-4">
                 <h3 className="text-lg font-bold font-display text-white">Baixar Extensão ZapFlow</h3>
-                <p className="text-slate-400 text-xs mt-1">Baixe a extensão oficial para realizar envios integrados em massa.</p>
+                <p className="text-slate-405 text-xs mt-1">Baixe a extensão oficial para realizar envios integrados em massa.</p>
               </div>
               
-              {userPlan !== 'quarterly' && userPlan !== 'annual' ? (
-                <div className="p-4 bg-slate-950/50 border border-slate-850/60 text-slate-400 rounded-xl text-xs flex flex-col sm:flex-row justify-between items-center gap-4">
+              {userPlan !== 'monthly' && userPlan !== 'quarterly' && userPlan !== 'annual' ? (
+                <div className="p-4 bg-slate-950/50 border border-slate-850/60 text-slate-405 rounded-xl text-xs flex flex-col sm:flex-row justify-between items-center gap-4">
                   <div className="flex items-center gap-2">
                     <Lock className="w-4 h-4 text-slate-500 shrink-0" />
-                    <span>A extensão ZapFlow está disponível apenas para os planos Trimestral e Anual.</span>
+                    <span>A extensão ZapFlow está disponível apenas para assinantes.</span>
                   </div>
                   <button
                     onClick={() => setActiveTab('plans')}
@@ -1540,7 +1540,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                     Fazer Upgrade
                   </button>
                 </div>
-              ) : timeRemaining ? (
+              ) : timeRemaining && (userPlan === 'quarterly' || userPlan === 'annual') ? (
                 <div className="p-4 bg-red-500/5 border border-red-500/10 text-red-400 rounded-xl text-xs flex flex-col sm:flex-row justify-between items-center gap-4 animate-pulse">
                   <div className="flex items-center gap-2">
                     <Lock className="w-4 h-4 text-red-400 shrink-0" />
@@ -1567,7 +1567,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
         )}
 
         {/* Tab: Grupo VIP */}
-        {activeTab === 'vip' && userPlan === 'annual' && (
+        {activeTab === 'vip' && (userPlan === 'quarterly' || userPlan === 'annual') && (
           <div className="space-y-8 animate-fade-in max-w-4xl mx-auto">
             <div className="border-b border-slate-900 pb-5">
               <h2 className="text-2xl font-bold font-display text-white">Grupo VIP de Suporte</h2>
@@ -1864,7 +1864,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                                     )}
                                   </td>
                                   <td className="p-4 text-center" onClick={(e) => e.stopPropagation()}>
-                                    {userPlan === 'quarterly' || userPlan === 'annual' ? (
+                                    {userPlan === 'monthly' || userPlan === 'quarterly' || userPlan === 'annual' ? (
                                       <a
                                         href={`https://wa.me/${getCleanPhone(place.phone)}`}
                                         target="_blank"
@@ -2212,7 +2212,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
               {[
                 {
                   name: 'Mensal',
-                  price: 'R$ 47',
+                  price: 'R$ 67',
                   period: '/mês',
                   description: 'Ideal para testar a ferramenta e buscar primeiros leads.',
                   features: [
@@ -2220,7 +2220,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                     { text: 'Acesso completo ao Google Places Crawler', included: true },
                     { text: 'Filtro automático de leads sem website', included: true },
                     { text: 'Exportação ilimitada para CSV', included: true },
-                    { text: 'Disparador inteligente', included: false },
+                    { text: 'Disparador inteligente Zapflow extensão', included: true },
                     { text: 'Suporte prioritário', included: false },
                     { text: 'Curso completo de renda extra', included: false },
                     { text: 'Grupo VIP de suporte', included: false },
@@ -2231,25 +2231,23 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                   link: 'https://pay.cakto.com.br/mihqmub_933107'
                 },
                 {
-                  name: 'Anual',
+                  name: 'Trimestral',
                   price: 'R$ 197',
-                  period: '/ano',
-                  subPrice: 'equivalente a R$0,54/dia',
-                  description: 'Para agências e equipes que buscam resultados de longo prazo.',
+                  period: '/trimestre',
+                  subPrice: 'equivalente a R$65,66/mês',
+                  description: 'A melhor opção com acesso a todo o ecossistema e suporte VIP.',
                   features: [
-                    { text: '5.000 leads/mês', included: true },
+                    { text: 'Até 1.500 leads por mês', included: true },
                     { text: 'Acesso completo ao Google Places Crawler', included: true },
                     { text: 'Filtro automático de leads sem website', included: true },
-                    { text: 'Exportação para CSV', included: true },
-                    { text: 'Disparador inteligente', included: true },
+                    { text: 'Exportação ilimitada para CSV', included: true },
+                    { text: 'Disparador inteligente Zapflow extensão', included: true },
                     { text: 'Suporte prioritário', included: true },
                     { text: 'Curso completo de renda extra', included: true },
                     { text: 'Grupo VIP de suporte', included: true },
-                    { text: 'Reuniões mensais com estratégias', included: true },
-                    { text: 'Acesso antecipado a novidades', included: true },
-                    { text: 'R$197 ao invés de R$564 — economize R$367', included: true }
+                    { text: 'Reuniões mensais com estratégias', included: true }
                   ],
-                  recommended: false,
+                  recommended: true,
                   buttonText: 'Garantir o melhor preço',
                   link: 'https://pay.cakto.com.br/cx86ktu'
                 }
