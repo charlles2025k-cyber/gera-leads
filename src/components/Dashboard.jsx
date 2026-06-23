@@ -879,13 +879,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
             <button
               onClick={() => {
                 if (userPlan === 'quarterly' || userPlan === 'annual') {
-                  if (timeRemaining) {
-                    setLockModal({
-                      isOpen: true,
-                      title: 'Acesso Restrito',
-                      message: `Acesso liberado em ${Math.ceil(timeRemaining.totalMs / (1000 * 60 * 60 * 24))} dias. O período de garantia de 7 dias precisa ser concluído.`
-                    });
-                  } else {
+                  if (!timeRemaining) {
                     window.open('https://t.me/+GCtked4jQ0ZmYWYx', '_blank');
                   }
                 } else {
@@ -896,7 +890,12 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                   });
                 }
               }}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border border-transparent cursor-pointer text-slate-400 hover:text-white hover:bg-slate-850/30"
+              disabled={!!timeRemaining && (userPlan === 'quarterly' || userPlan === 'annual')}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border border-transparent ${
+                timeRemaining && (userPlan === 'quarterly' || userPlan === 'annual')
+                  ? 'opacity-50 cursor-not-allowed text-slate-500'
+                  : 'cursor-pointer text-slate-400 hover:text-white hover:bg-slate-850/30'
+              }`}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <Send className="w-4 h-4 shrink-0" />
@@ -1117,12 +1116,21 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                         </div>
                       )}
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-mono text-slate-200 truncate" title={zapflowLicense.license_key}>
+                        <span 
+                          className="text-xs font-mono text-slate-200 truncate" 
+                          title={timeRemaining ? 'Chave bloqueada durante o período de garantia' : zapflowLicense.license_key}
+                          style={timeRemaining ? { filter: 'blur(6px)', userSelect: 'none' } : {}}
+                        >
                           {zapflowLicense.license_key}
                         </span>
                         <button
                           onClick={() => handleCopyLicenseKey(zapflowLicense.license_key)}
-                          className="px-2 py-0.5 bg-slate-850 hover:bg-slate-800 text-slate-300 hover:text-white rounded border border-slate-750 text-[10px] font-semibold transition-all cursor-pointer whitespace-nowrap"
+                          disabled={!!timeRemaining}
+                          className={`px-2 py-0.5 rounded border text-[10px] font-semibold transition-all whitespace-nowrap ${
+                            timeRemaining
+                              ? 'bg-slate-900 border-slate-800 text-slate-650 cursor-not-allowed opacity-50'
+                              : 'bg-slate-850 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-750 cursor-pointer'
+                          }`}
                         >
                           {copiedKey ? 'Copiado!' : 'Copiar'}
                         </button>
