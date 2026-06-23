@@ -1010,7 +1010,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
           {/* Logo */}
           <div className="flex flex-col items-center justify-center text-center gap-2 mb-6">
             <img 
-              src="/favicon.svg" 
+              src="/logo.jpg" 
               alt="Gera Leads" 
               className="w-12 h-12 rounded-xl shadow-lg shadow-indigo-500/10 border border-slate-800" 
             />

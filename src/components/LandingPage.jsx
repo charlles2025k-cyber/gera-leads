@@ -102,7 +102,7 @@ export default function LandingPage({ onNavigateApp }) {
         <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img 
-              src="/favicon.svg" 
+              src="/logo.jpg" 
               alt="Gera Leads" 
               className="w-10 h-10 rounded-xl shadow-lg border border-slate-800" 
             />
@@ -473,7 +473,7 @@ export default function LandingPage({ onNavigateApp }) {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
           <div className="flex items-center gap-3">
             <img 
-              src="/favicon.svg" 
+              src="/logo.jpg" 
               alt="Gera Leads" 
               className="w-8 h-8 rounded-lg shadow-md border border-slate-800" 
             />

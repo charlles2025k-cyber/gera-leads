@@ -89,7 +89,7 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }) {
     <div className="w-full max-w-md p-8 rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 shadow-2xl animate-fade-in login-card-glow">
       <div className="flex flex-col items-center mb-8">
         <img 
-          src="/favicon.svg" 
+          src="/logo.jpg" 
           alt="Gera Leads" 
           className="w-16 h-16 rounded-xl shadow-lg shadow-indigo-500/10 border border-slate-800 mb-4" 
         />
