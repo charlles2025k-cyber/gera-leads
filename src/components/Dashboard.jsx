@@ -86,6 +86,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
   const [searchingGroups, setSearchingGroups] = useState(false);
   const [groupResults, setGroupResults] = useState([]);
   const [groupError, setGroupError] = useState('');
+  const [groupLimit, setGroupLimit] = useState(10);
 
   // Calculate ZapFlow 7-day guarantee lock remaining time
   useEffect(() => {
@@ -484,19 +485,83 @@ export default function Dashboard({ user, onLogout, showAlert }) {
       return;
     }
 
-    const cleanNiche = groupNiche.trim();
-    const cleanCity = groupCity.trim();
-    const queryParts = [];
-    queryParts.push(`"${cleanNiche}"`);
-    if (cleanCity) {
-      queryParts.push(`"${cleanCity}"`);
-    }
-    queryParts.push('"chat.whatsapp.com"');
-    queryParts.push(`site:${groupPlatform}`);
-    
-    const queryStr = queryParts.join(' ');
-
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Usuário não autenticado. Por favor, faça login novamente.');
+      }
+      const userId = session.user.id;
+
+      // 1. Get the user's current usage tracking status from Supabase
+      let { data: usage, error: usageErr } = await supabase
+        .from('usage_tracking')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (usageErr) throw usageErr;
+
+      const now = new Date();
+
+      if (!usage) {
+        // Create new usage record if none exists
+        const { data: newUsage, error: insertErr } = await supabase
+          .from('usage_tracking')
+          .insert({
+            user_id: userId,
+            leads_used: 0,
+            period_start: now.toISOString(),
+            created_at: now.toISOString()
+          })
+          .select()
+          .single();
+
+        if (insertErr) throw insertErr;
+        usage = newUsage;
+      } else {
+        // Reset logic: check if period_start is older than 30 days
+        const periodStart = new Date(usage.period_start);
+        const diffTime = Math.abs(now - periodStart);
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        if (diffDays >= 30) {
+          const { data: resetUsage, error: updateErr } = await supabase
+            .from('usage_tracking')
+            .update({
+              leads_used: 0,
+              period_start: now.toISOString()
+            })
+            .eq('id', usage.id)
+            .select()
+            .single();
+
+          if (updateErr) throw updateErr;
+          usage = resetUsage;
+        }
+      }
+
+      const currentLeadsUsed = usage.leads_used || 0;
+      const remainingLeads = planLimit - currentLeadsUsed;
+
+      if (remainingLeads < groupLimit) {
+        const errorMsg = "Você não tem leads suficientes. Reduza o limite ou faça upgrade.";
+        setGroupError(errorMsg);
+        if (showAlert) showAlert(errorMsg, 'warning');
+        setSearchingGroups(false);
+        return;
+      }
+
+      const cleanNiche = groupNiche.trim();
+      const cleanCity = groupCity.trim();
+      const queryParts = [];
+      queryParts.push(`"${cleanNiche}"`);
+      if (cleanCity) {
+        queryParts.push(`"${cleanCity}"`);
+      }
+      queryParts.push('"chat.whatsapp.com"');
+      queryParts.push(`site:${groupPlatform}`);
+      
+      const queryStr = queryParts.join(' ');
+
       const response = await fetch(
         `https://api.apify.com/v2/acts/apify~google-search-scraper/run-sync-get-dataset-items?token=${apiKey}`,
         {
@@ -507,9 +572,9 @@ export default function Dashboard({ user, onLogout, showAlert }) {
           body: JSON.stringify({
             queries: queryStr,
             maxPagesPerQuery: 1,
-            resultsPerPage: 100,
+            resultsPerPage: groupLimit,
             countryCode: "br",
-            languageCode: "pt"
+            languageCode: "pt-BR"
           })
         }
       );
@@ -562,6 +627,23 @@ export default function Dashboard({ user, onLogout, showAlert }) {
         });
 
         setGroupResults(uniqueParsed);
+
+        // Increment leads_used by the number of unique group results returned
+        const newLeadsUsed = currentLeadsUsed + uniqueParsed.length;
+        const { error: incrementErr } = await supabase
+          .from('usage_tracking')
+          .update({ leads_used: newLeadsUsed })
+          .eq('id', usage.id);
+
+        if (incrementErr) {
+          console.error("Erro ao atualizar o uso de leads:", incrementErr);
+        } else {
+          setUsageTracking(prev => ({
+            ...prev,
+            leads_used: newLeadsUsed
+          }));
+        }
+
         if (showAlert) showAlert(`Busca concluída! Encontramos ${uniqueParsed.length} grupos de WhatsApp.`, 'success');
       } else {
         throw new Error('Formato de dados retornado inválido. Esperava-se uma lista.');
@@ -1920,6 +2002,30 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                       <option value="linkedin.com" className="bg-[#070b13]">LinkedIn</option>
                       <option value="twitter.com" className="bg-[#070b13]">Twitter</option>
                     </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-355 text-xs font-semibold mb-1.5">Limite de Resultados (Máx: 50)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="50"
+                      className="w-full px-3 py-2.5 bg-slate-950/50 border border-slate-850 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl text-xs text-white outline-none transition-all"
+                      value={groupLimit}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        if (isNaN(val)) {
+                          setGroupLimit('');
+                        } else {
+                          setGroupLimit(Math.min(50, Math.max(1, val)));
+                        }
+                      }}
+                      onBlur={() => {
+                        if (!groupLimit) setGroupLimit(10);
+                      }}
+                      disabled={searchingGroups}
+                      required
+                    />
                   </div>
 
                   <button
