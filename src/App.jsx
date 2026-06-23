@@ -5,6 +5,7 @@ import ResetPassword from './components/ResetPassword';
 import Dashboard from './components/Dashboard';
 import AnimatedBackground from './components/AnimatedBackground';
 import LandingPage from './components/LandingPage';
+import ThankYouPage from './components/ThankYouPage';
 import Alert from './components/Alert';
 import { supabase } from './lib/supabase';
 
@@ -118,6 +119,18 @@ export default function App() {
             }}
           />
         </AnimatedBackground>
+      );
+    }
+
+    // Route: Thank You page at public "/obrigado"
+    if (path === '/obrigado') {
+      return (
+        <ThankYouPage 
+          onNavigateApp={() => {
+            window.history.pushState({}, '', '/app');
+            setPath('/app');
+          }}
+        />
       );
     }
 

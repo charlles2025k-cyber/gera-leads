@@ -86,14 +86,6 @@ export default function LandingPage({ onNavigateApp }) {
       img: "/screenshots/funil.png"
     },
     {
-      icon: Layers,
-      title: "Integração ZapFlow",
-      desc: "Extensão exclusiva para Chrome que se integra ao WhatsApp Web, permitindo gerenciar funis e prospecção diretamente na conversa.",
-      color: "from-purple-500 to-pink-600",
-      glowColor: "rgba(168, 85, 247, 0.15)",
-      img: "/screenshots/zapflow.png"
-    },
-    {
       icon: Users,
       title: "Sistema de Grupos WhatsApp",
       desc: "Busque links de grupos de WhatsApp divulgados em redes sociais e na internet para realizar abordagens em massa ou networking segmentado.",
