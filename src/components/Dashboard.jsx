@@ -33,6 +33,12 @@ export default function Dashboard({ user, onLogout, showAlert }) {
   const [results, setResults] = useState([]);
   const [filterText, setFilterText] = useState('');
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset pagination on filter change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterText]);
 
   // WhatsApp & Dispatch States
   const [selectedLeads, setSelectedLeads] = useState([]);
@@ -415,6 +421,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
     setResults([]);
     setSelectedLeads([]);
     setDispatchStatus({});
+    setCurrentPage(1);
 
     if (!apiKey) {
       const errorMsg = 'Por favor, configure e salve sua API Key do Apify para realizar buscas reais.';
@@ -651,6 +658,14 @@ export default function Dashboard({ user, onLogout, showAlert }) {
       item.categoryName.toLowerCase().includes(text)
     );
   });
+
+  // Pagination calculations
+  const indexOfLastLead = currentPage * 10;
+  const indexOfFirstLead = indexOfLastLead - 10;
+  const currentLeads = filteredResults.slice(indexOfFirstLead, indexOfLastLead);
+  const totalPages = Math.ceil(filteredResults.length / 10);
+  const showingFrom = filteredResults.length === 0 ? 0 : indexOfFirstLead + 1;
+  const showingTo = Math.min(indexOfLastLead, filteredResults.length);
 
   // Calculate Metrics from history
   const metrics = useMemo(() => {
@@ -1407,8 +1422,8 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-850/60">
-                            {filteredResults.length > 0 ? (
-                              filteredResults.map((place, idx) => (
+                            {currentLeads.length > 0 ? (
+                              currentLeads.map((place, idx) => (
                                 <tr 
                                   key={idx} 
                                   onClick={() => setSelectedPlace(place)}
@@ -1496,6 +1511,42 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                           </tbody>
                         </table>
                       </div>
+
+                      {/* Pagination Controls */}
+                      {filteredResults.length > 0 && (
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 border-t border-slate-850/60 pt-5 text-xs">
+                          <span className="text-slate-400">
+                            Mostrando <span className="font-semibold text-slate-200">{showingFrom}</span> a{" "}
+                            <span className="font-semibold text-slate-200">{showingTo}</span> de{" "}
+                            <span className="font-semibold text-slate-200">{filteredResults.length}</span> leads
+                          </span>
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                              disabled={currentPage === 1}
+                              className="px-3 py-2 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 disabled:text-slate-500 disabled:bg-slate-900/30 disabled:border-slate-850/50 border border-slate-750/50 rounded-xl font-medium transition-all active:scale-[0.98] disabled:scale-100 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
+                            >
+                              Anterior
+                            </button>
+
+                            <div className="flex items-center gap-1.5 px-1">
+                              <span className="text-slate-400">
+                                Página <span className="font-semibold text-slate-200">{currentPage}</span> de{" "}
+                                <span className="font-semibold text-slate-200">{totalPages}</span>
+                              </span>
+                            </div>
+
+                            <button
+                              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                              disabled={currentPage === totalPages || totalPages === 0}
+                              className="px-3 py-2 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 disabled:text-slate-500 disabled:bg-slate-900/30 disabled:border-slate-850/50 border border-slate-750/50 rounded-xl font-medium transition-all active:scale-[0.98] disabled:scale-100 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
+                            >
+                              Próximo
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="flex-1 flex flex-col justify-center items-center py-12 text-center">
