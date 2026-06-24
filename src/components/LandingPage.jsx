@@ -23,7 +23,7 @@ export default function LandingPage({ onNavigateApp }) {
   const scroll = (direction) => {
     if (scrollRef.current) {
       const { scrollLeft, clientWidth } = scrollRef.current;
-      const cardWidth = window.innerWidth < 640 ? clientWidth * 0.9 + 16 : 320 + 24;
+      const cardWidth = window.innerWidth < 640 ? clientWidth * 0.9 + 16 : 380 + 24;
       const scrollTo = direction === 'left' 
         ? scrollLeft - cardWidth 
         : scrollLeft + cardWidth;
@@ -187,32 +187,6 @@ export default function LandingPage({ onNavigateApp }) {
               Ver planos
             </a>
           </div>
-
-          {/* Interactive Mockup Container */}
-          <div className="pt-16 max-w-5xl mx-auto">
-            <div className="relative rounded-2xl border border-slate-800/80 bg-slate-950/40 p-4 shadow-2xl backdrop-blur-sm overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-              
-              {/* Window Buttons */}
-              <div className="flex gap-1.5 mb-4 border-b border-slate-900 pb-3">
-                <span className="w-3 h-3 rounded-full bg-red-500/30" />
-                <span className="w-3 h-3 rounded-full bg-yellow-500/30" />
-                <span className="w-3 h-3 rounded-full bg-green-500/30" />
-              </div>
-
-              {/* YouTube Video Embed inside macOS window */}
-              <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-inner border border-slate-900 bg-black">
-                <iframe
-                  src="https://www.youtube.com/embed/Azr1ZHIIOpE?start=637"
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="absolute inset-0 w-full h-full"
-                ></iframe>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -304,7 +278,7 @@ export default function LandingPage({ onNavigateApp }) {
                 return (
                   <div
                     key={idx}
-                    className="snap-start shrink-0 w-[90%] sm:w-[320px] rounded-2xl border border-slate-850 bg-slate-950/40 p-6 flex flex-col justify-between shadow-lg backdrop-blur-sm relative overflow-hidden transition-all duration-300 hover:border-slate-800 hover:bg-slate-950/60"
+                    className="snap-start shrink-0 w-[90%] sm:w-[380px] h-[480px] md:h-[520px] rounded-2xl border border-slate-850 bg-slate-950/40 p-6 flex flex-col justify-between shadow-lg backdrop-blur-sm relative overflow-hidden transition-all duration-300 hover:border-slate-800 hover:bg-slate-950/60"
                   >
                     {/* Glow effect matching feature color */}
                     <div 
@@ -328,7 +302,7 @@ export default function LandingPage({ onNavigateApp }) {
                     </div>
 
                     {/* Image Area */}
-                    <div className="mt-6 relative rounded-lg overflow-hidden border border-slate-900 bg-slate-950/80 aspect-[4/3] flex items-center justify-center">
+                    <div className="mt-6 flex-1 relative rounded-lg overflow-hidden border border-slate-900 bg-slate-950/80 flex items-center justify-center">
                       <img
                         src={feat.img}
                         alt={feat.title}

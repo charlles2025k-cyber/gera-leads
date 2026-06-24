@@ -1128,7 +1128,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
 
             <button
               onClick={() => {
-                if (userPlan === 'quarterly' || userPlan === 'annual') {
+                if (userPlan === 'monthly' || userPlan === 'quarterly' || userPlan === 'annual') {
                   if (!timeRemaining) {
                     window.open('https://t.me/+GCtked4jQ0ZmYWYx', '_blank');
                   }
@@ -1140,9 +1140,9 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                   });
                 }
               }}
-              disabled={!!timeRemaining && (userPlan === 'quarterly' || userPlan === 'annual')}
+              disabled={!!timeRemaining && (userPlan === 'monthly' || userPlan === 'quarterly' || userPlan === 'annual')}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border border-transparent ${
-                timeRemaining && (userPlan === 'quarterly' || userPlan === 'annual')
+                timeRemaining && (userPlan === 'monthly' || userPlan === 'quarterly' || userPlan === 'annual')
                   ? 'opacity-50 cursor-not-allowed text-slate-500'
                   : 'cursor-pointer text-slate-400 hover:text-white hover:bg-slate-850/30'
               }`}
@@ -1151,7 +1151,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                 <Send className="w-4 h-4 shrink-0" />
                 <span className="truncate">Telegram</span>
               </div>
-              {userPlan !== 'quarterly' && userPlan !== 'annual' ? (
+              {userPlan !== 'monthly' && userPlan !== 'quarterly' && userPlan !== 'annual' ? (
                 <Lock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
               ) : (
                 timeRemaining && (
