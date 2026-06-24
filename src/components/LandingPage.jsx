@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Search, Download, MessageSquare, RefreshCw, Key, 
   MapPin, Database, Check, ArrowRight, ShieldCheck, 
@@ -9,6 +9,16 @@ import {
 export default function LandingPage({ onNavigateApp }) {
   const [openFaq, setOpenFaq] = useState(null);
   const scrollRef = useRef(null);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = "https://player.vimeo.com/api/player.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const scroll = (direction) => {
     if (scrollRef.current) {
@@ -202,6 +212,42 @@ export default function LandingPage({ onNavigateApp }) {
                 ></iframe>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Demonstration Section */}
+      <section className="py-20 border-t border-slate-900 bg-slate-950/20 px-4 sm:px-6 relative overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
+          <div className="space-y-3">
+            <h2 className="text-3xl sm:text-4xl font-bold font-display text-white">
+              Veja como funciona em 2 minutos
+            </h2>
+            <p className="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto">
+              Do cadastro ao primeiro lead em menos de 5 minutos
+            </p>
+          </div>
+
+          <div className="max-w-[900px] mx-auto rounded-2xl border border-slate-800/80 bg-slate-950/40 p-3 sm:p-4 shadow-[0_0_50px_-12px_rgba(99,102,241,0.15)] backdrop-blur-sm">
+            <div style={{ padding: '56.25% 0 0 0', position: 'relative' }} className="rounded-xl overflow-hidden border border-slate-900 bg-black">
+              <iframe 
+                src="https://player.vimeo.com/video/1204285931?badge=0&autopause=0&player_id=0&app_id=58479" 
+                frameBorder="0" 
+                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+                referrerPolicy="strict-origin-when-cross-origin" 
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} 
+                title="APRESENTAÇÃO DO GERA LEADS"
+              />
+            </div>
+          </div>
+
+          <div className="pt-4">
+            <a
+              href="#pricing"
+              className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-indigo-950/30 active:scale-[0.98] cursor-pointer"
+            >
+              Começar agora
+            </a>
           </div>
         </div>
       </section>
