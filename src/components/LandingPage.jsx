@@ -58,7 +58,7 @@ export default function LandingPage({ onNavigateApp }) {
     },
     {
       q: "Quanto posso buscar por mês?",
-      a: "Depende do seu plano: Mensal tem 500 leads/mês e Anual tem 1.500 leads/mês."
+      a: "Depende do seu plano: Mensal tem 500 leads/mês e Anual tem 5.000 leads/mês."
     }
   ];
 
@@ -428,7 +428,7 @@ export default function LandingPage({ onNavigateApp }) {
                 <ul className="space-y-3.5 text-xs text-slate-350 border-t border-slate-850 pt-6">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Até 1.500 leads por mês</span>
+                    <span>Até 5.000 leads por mês</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />

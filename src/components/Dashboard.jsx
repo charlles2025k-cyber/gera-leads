@@ -286,7 +286,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
   const planLimit = useMemo(() => {
     const plan = (profile?.plan || 'free').trim();
     if (plan === 'monthly') return 500;
-    if (plan === 'quarterly') return 1500;
+    if (plan === 'quarterly') return 5000;
     if (plan === 'annual') return 5000;
     return 0;
   }, [profile]);
@@ -711,7 +711,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
       // Determine the limit based on plan
       let planLimit = 0;
       if (plan === 'monthly') planLimit = 500;
-      else if (plan === 'quarterly') planLimit = 1500;
+      else if (plan === 'quarterly') planLimit = 5000;
       else if (plan === 'annual') planLimit = 5000;
 
       // 2. Get the user's current usage tracking status
@@ -1497,19 +1497,19 @@ export default function Dashboard({ user, onLogout, showAlert }) {
         {activeTab === 'course' && (userPlan === 'quarterly' || userPlan === 'annual') && (
           <div className="space-y-8 animate-fade-in max-w-4xl mx-auto">
             <div className="border-b border-slate-900 pb-5">
-              <h2 className="text-2xl font-bold font-display text-white">Curso Renda Extra</h2>
+              <h2 className="text-2xl font-bold font-display text-white">Como Usar a Plataforma Passo a Passo</h2>
               <p className="text-slate-400 text-xs mt-1">Aprenda a prospectar e vender para leads sem site</p>
             </div>
             <div className="p-6 md:p-8 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl space-y-6">
               <div className="border-b border-slate-800/60 pb-4">
-                <h3 className="text-lg font-bold font-display text-white">Curso Completo de Renda Extra</h3>
+                <h3 className="text-lg font-bold font-display text-white">Como Usar a Plataforma Passo a Passo</h3>
                 <p className="text-slate-400 text-xs mt-1">Aprenda a gerar renda extra com prospecção de clientes.</p>
               </div>
               <div className="w-full aspect-video rounded-xl overflow-hidden border border-slate-800 shadow-2xl">
                 <iframe 
                   width="100%" 
                   height="100%" 
-                  src="https://www.youtube.com/embed/3Tfd9RZQqxo?si=Hxna654PM11qmHiD" 
+                  src="https://www.youtube.com/embed/BsT4tVPmI1U" 
                   title="YouTube video player" 
                   frameBorder="0" 
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -2264,7 +2264,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                   subPrice: 'equivalente a R$16,41/mês',
                   description: 'A melhor opção com acesso a todo o ecossistema e suporte VIP.',
                   features: [
-                    { text: 'Até 1.500 leads por mês', included: true },
+                    { text: 'Até 5.000 leads por mês', included: true },
                     { text: 'Acesso completo ao Google Places Crawler', included: true },
                     { text: 'Filtro automático de leads sem website', included: true },
                     { text: 'Exportação ilimitada para CSV', included: true },
