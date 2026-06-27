@@ -345,7 +345,7 @@ export default function LandingPage({ onNavigateApp }) {
                 </div>
 
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-white">R$ 67</span>
+                  <span className="text-4xl font-black text-white">R$ 37</span>
                   <span className="text-slate-500 text-xs">/mês</span>
                 </div>
 
@@ -419,10 +419,10 @@ export default function LandingPage({ onNavigateApp }) {
 
                 <div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-white">R$ 197</span>
+                    <span className="text-4xl font-black text-white">R$ 67</span>
                     <span className="text-slate-500 text-xs">/ano</span>
                   </div>
-                  <span className="text-[10px] text-emerald-400 font-bold block mt-1">Equivalente a R$ 16,41/mês</span>
+                  <span className="text-[10px] text-emerald-400 font-bold block mt-1">Equivalente a R$ 5,58/mês</span>
                 </div>
 
                 <ul className="space-y-3.5 text-xs text-slate-350 border-t border-slate-850 pt-6">

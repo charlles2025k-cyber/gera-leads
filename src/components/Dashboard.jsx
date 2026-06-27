@@ -2238,7 +2238,7 @@ export default function Dashboard({ user, onLogout, showAlert }) {
               {[
                 {
                   name: 'Mensal',
-                  price: 'R$ 67',
+                  price: 'R$ 37',
                   period: '/mês',
                   description: 'Ideal para testar a ferramenta e buscar primeiros leads.',
                   features: [
@@ -2259,9 +2259,9 @@ export default function Dashboard({ user, onLogout, showAlert }) {
                 },
                 {
                   name: 'Anual',
-                  price: 'R$ 197',
+                  price: 'R$ 67',
                   period: '/ano',
-                  subPrice: 'equivalente a R$16,41/mês',
+                  subPrice: 'equivalente a R$5,58/mês',
                   description: 'A melhor opção com acesso a todo o ecossistema e suporte VIP.',
                   features: [
                     { text: 'Até 5.000 leads por mês', included: true },
